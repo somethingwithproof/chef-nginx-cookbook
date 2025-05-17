@@ -1,5 +1,9 @@
 FROM ruby:3.4-slim
 
+LABEL org.opencontainers.image.source=https://github.com/thomasvincent/chef-nginx-cookbook
+LABEL org.opencontainers.image.description="NGINX Chef Cookbook Package"
+LABEL org.opencontainers.image.licenses=Apache-2.0
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \

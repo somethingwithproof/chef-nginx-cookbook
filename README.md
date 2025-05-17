@@ -281,6 +281,38 @@ default_attributes = {
 }
 ```
 
+## Installation
+
+### From Supermarket
+
+You can install this cookbook from Chef Supermarket:
+
+```ruby
+# Berksfile
+cookbook 'nginx', '~> 1.1.0'
+```
+
+### Using Policyfile
+
+```ruby
+# Policyfile.rb
+default_source :supermarket
+run_list 'nginx::default'
+cookbook 'nginx', '~> 1.1.0'
+```
+
+### From GitHub Packages
+
+This cookbook is also available as a package from GitHub Packages:
+
+```bash
+# Add to your Berksfile
+cookbook 'nginx', github: 'thomasvincent/chef-nginx-cookbook', tag: 'v1.1.0'
+
+# Or using Docker
+docker pull ghcr.io/thomasvincent/nginx:1.1.0
+```
+
 ## Testing
 
 This cookbook uses:

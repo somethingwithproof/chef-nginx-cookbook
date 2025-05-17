@@ -1,0 +1,55 @@
+name: Publish to GitHub Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+        
+      - name: Run Cookstyle
+        run: cookstyle
+      
+      - name: Publish to GitHub Packages
+        run: |
+          mkdir -p ~/.chef
+          cat > ~/.chef/config.rb << EOL
+          node_name 'github-actions'
+          client_key '/tmp/fake.pem'
+          chef_server_url 'http://127.0.0.1:8889'
+          cookbook_path '.'
+          EOL
+          touch /tmp/fake.pem
+          
+          VERSION=${GITHUB_REF#refs/tags/v}
+          COOKBOOK_NAME=$(grep -m 1 "^name" metadata.rb | sed -e "s/name ['\"]\([^'\"]*\)['\"]*/\1/")
+          
+          # Create tarball
+          mkdir -p dist
+          tar -czf dist/${COOKBOOK_NAME}-${VERSION}.tgz --exclude='.git' --exclude='dist' --exclude='test' --exclude='spec' .
+          
+          # Upload to GitHub Packages
+          echo "${GPR_TOKEN}" | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
+          docker tag ${COOKBOOK_NAME}:latest ghcr.io/${GITHUB_REPOSITORY_OWNER}/${COOKBOOK_NAME}:${VERSION}
+          docker push ghcr.io/${GITHUB_REPOSITORY_OWNER}/${COOKBOOK_NAME}:${VERSION}
+          docker tag ${COOKBOOK_NAME}:latest ghcr.io/${GITHUB_REPOSITORY_OWNER}/${COOKBOOK_NAME}:latest
+          docker push ghcr.io/${GITHUB_REPOSITORY_OWNER}/${COOKBOOK_NAME}:latest
+        env:
+          GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
