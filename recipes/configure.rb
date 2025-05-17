@@ -58,14 +58,14 @@ end
 # Generate DH parameters for nginx if enabled
 if node['nginx']['security']['ssl_enabled'] && !node['nginx']['security']['dhparam_file']
   dhparam_file = "#{node['nginx']['conf_dir']}/dhparam.pem"
-  
+
   # Generate Diffie-Hellman parameters
   execute 'generate-dhparam' do
     command "openssl dhparam -out #{dhparam_file} 2048"
     not_if { ::File.exist?(dhparam_file) }
     notifies :reload, 'nginx_service[default]', :delayed
   end
-  
+
   # Set the dhparam attribute
   node.run_state['nginx_dhparam_file'] = dhparam_file
 end

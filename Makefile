@@ -1,7 +1,7 @@
 # Makefile for NGINX cookbook testing
 
 .PHONY: all style spec integration-docker integration-dokken integration-suite integration-platform \
-        docker-build docker-basic docker-kitchen docker-dokken docker-tests docker-all ci default
+        docker-build docker-basic docker-kitchen docker-dokken docker-rspec docker-tests docker-all ci default
 
 # Style tests
 style:
@@ -51,8 +51,12 @@ docker-kitchen: docker-build
 docker-dokken: docker-build
 	docker-compose run --rm test-dokken
 
+# Docker RSpec test
+docker-rspec: docker-build
+	docker-compose run --rm test-rspec
+
 # Run all Docker-based tests
-docker-tests: docker-build docker-basic docker-kitchen docker-dokken
+docker-tests: docker-build docker-rspec docker-basic docker-kitchen docker-dokken
 
 # Run all tests
 all: style spec integration-docker

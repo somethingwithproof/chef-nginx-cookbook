@@ -13,13 +13,13 @@ describe http('http://localhost') do
 end
 
 # Test for site1.example.com (using Host header)
-describe http('http://localhost', headers: {'Host' => 'site1.example.com'}) do
+describe http('http://localhost', headers: { 'Host' => 'site1.example.com' }) do
   its('status') { should eq 200 }
   its('body') { should match /site1.example.com/ }
 end
 
 # Test for site2.example.com (using Host header)
-describe http('http://localhost', headers: {'Host' => 'site2.example.com'}) do
+describe http('http://localhost', headers: { 'Host' => 'site2.example.com' }) do
   its('status') { should eq 200 }
   its('body') { should match /site2.example.com/ }
 end

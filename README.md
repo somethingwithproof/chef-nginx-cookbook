@@ -10,14 +10,17 @@ A modern, advanced Chef cookbook to install and configure Nginx with comprehensi
 
 ### Platforms
 
-- Ubuntu 20.04+
-- Debian 11+
-- CentOS Stream 8+
-- Red Hat Enterprise Linux 8+
-- Amazon Linux 2+
-- Rocky Linux 8+
-- AlmaLinux 8+
-- Fedora 35+
+- Ubuntu 18.04, 20.04, 22.04
+- Debian 10, 11
+- FreeBSD 13.x
+- macOS 12.x, 13.x, 14.x
+- Oracle Enterprise Linux 7.x, 8.x
+- Red Hat Enterprise Linux (RHEL) 7.x, 8.x, 9.x
+- Rocky Linux 8.x, 9.x
+- AlmaLinux 8.x, 9.x
+- SUSE Linux Enterprise Server (SLES) 12, 15
+- Amazon Linux 2.x, 2023
+- Windows 10, 11, Server 2016, 2019, 2022
 
 ### Chef
 
@@ -29,7 +32,8 @@ A modern, advanced Chef cookbook to install and configure Nginx with comprehensi
 - `build-essential` - For source installations
 - `selinux` - For SELinux configuration on RHEL-family systems
 - `apt` - For repository management on Debian-based systems
-- `yum-epel` - For repository management on RHEL-based systems
+
+Note: The yum-epel dependency was removed in favor of direct repository configuration.
 
 ## Features
 
@@ -283,23 +287,37 @@ This cookbook uses:
 
 - ChefSpec for unit testing
 - InSpec for integration testing
-- Test Kitchen for platform testing
-- Docker for containerized testing
+- Test Kitchen with kitchen-dokken and kitchen-vagrant drivers
+- Policyfiles for dependency management
+- Cookstyle for linting
+- Docker and VirtualBox for containerized/virtualized testing
 - GNU Make for test orchestration
 - GitHub Actions for CI/CD
 
 ```bash
+# Install dependencies
+bundle install
+
 # Run all tests
 make all
 
 # Run unit tests
 make spec
 
-# Run integration tests
+# Run integration tests with Docker
 make integration-docker
+
+# Run integration tests with Vagrant
+KITCHEN_YAML=.kitchen.vagrant.yml kitchen test
 
 # Run tests in Docker containers (recommended)
 make docker-all
+
+# Run a specific platform test
+make integration-platform PLATFORM=ubuntu-22.04
+
+# Run a specific test suite
+make integration-suite SUITE=default
 ```
 
 For detailed testing instructions, see the [TESTING.md](TESTING.md) file.

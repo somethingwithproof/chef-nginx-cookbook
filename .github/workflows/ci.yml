@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: ['ubuntu-2004', 'ubuntu-2204', 'debian-11']
+        os: ['ubuntu-2004', 'ubuntu-2204', 'debian-11', 'amazonlinux-2023', 'rocky-9', 'almalinux-9', 'oraclelinux-8']
         suite: ['default', 'ssl', 'multi-site', 'performance-tuning', 'modules']
       fail-fast: false
 

@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+unified_mode true
+
 property :domain, String, name_property: true
 property :site_name, String, default: lazy { domain }
 property :port, Integer, default: 80
@@ -37,13 +39,13 @@ property :ssl_protocols, String, default: lazy { node['nginx']['security']['ssl_
 property :ssl_ciphers, String, default: lazy { node['nginx']['security']['ssl_ciphers'] }
 property :ssl_cert, String
 property :ssl_key, String
-property :ssl_chain, [String, nil], default: nil
+property :ssl_chain, [String, nil]
 property :redirect_http_to_https, [true, false], default: false
 
 # Server specific settings
 property :custom_directives, [Array, String, nil], default: nil
 property :client_max_body_size, String
-property :proxy_pass, [String, nil], default: nil
+property :proxy_pass, [String, nil]
 property :proxy_set_header, Hash, default: {}
 property :php_fpm_enabled, [true, false], default: false
 property :php_fpm_socket, String, default: '/var/run/php/php-fpm.sock'

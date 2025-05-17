@@ -30,7 +30,7 @@ end
 # Check for headers in HTTPS response
 describe http('https://localhost', ssl_verify: false) do
   its('status') { should eq 200 }
-  its('headers.Content-Type') { should match /text\/html/ }
+  its('headers.Content-Type') { should match %r{text/html} }
   its('headers.X-Frame-Options') { should eq 'SAMEORIGIN' }
   its('headers.X-Content-Type-Options') { should eq 'nosniff' }
   its('headers.X-XSS-Protection') { should eq '1; mode=block' }

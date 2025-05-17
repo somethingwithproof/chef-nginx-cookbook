@@ -6,25 +6,24 @@ AllCops:
     - '.git/**/*'
     - 'bin/**/*'
     - 'Guardfile'
+    - 'Policyfile.rb'
+    - 'Policyfile.lock.json'
   NewCops: enable
+  TargetRubyVersion: 3.0
 
-ChefStyle/FileMode:
-  Enabled: true
-  EnforcedStyle: numeric
-
-ChefModernize/LibarchiveFileResource:
+Chef/Style/FileMode:
   Enabled: true
 
-ChefCorrectness/ChefApplicationFatal:
+Chef/Modernize/LibarchiveFileResource:
   Enabled: true
 
-ChefCorrectness/InvalidPlatformMetadata:
+Chef/Correctness/ChefApplicationFatal:
   Enabled: true
 
-ChefCorrectness/InvalidPlatformFamilyMetadata:
+Chef/Correctness/InvalidPlatformMetadata:
   Enabled: true
 
-ChefCorrectness/MissingPlatformMetadata:
+Chef/Correctness/InvalidPlatformFamilyInCase:
   Enabled: true
 
 Layout/LineLength:
@@ -70,3 +69,41 @@ Style/TrailingCommaInArrayLiteral:
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: consistent_comma
+
+# Chef-specific rules
+Chef/Modernize/DependsOnChefSpec:
+  Enabled: true
+
+Chef/Modernize/ExecuteAptUpdate:
+  Enabled: true
+
+Chef/Modernize/UnnecessaryDependsChef:
+  Enabled: true
+
+# FoodCritic is deprecated, using all Cookstyle cops instead
+Chef/Modernize/UnnecessaryDependsChef:
+  Enabled: true
+
+Chef/Modernize/PowershellInstallWindowsFeature:
+  Enabled: true
+
+Chef/Modernize/OpensslX509Resource:
+  Enabled: true
+
+Chef/Modernize/WindowsRegistryUAC:
+  Enabled: true
+
+Chef/Modernize/ExecuteSleep:
+  Enabled: true
+
+Chef/Style/CommentFormat:
+  Enabled: true
+
+Chef/Style/CopyrightCommentFormat:
+  Enabled: true
+
+Chef/Style/DirectiveMode:
+  Enabled: true
+
+Chef/Style/TrueClassFalseClassResourceProperties:
+  Enabled: true

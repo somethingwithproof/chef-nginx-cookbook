@@ -19,10 +19,12 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ### Prerequisites
 
-- Chef Workstation or ChefDK (Chef Development Kit)
-- Ruby 2.7 or later
-- Docker (for integration testing)
+- Chef Workstation 21.10 or later (with Chef Infra Client 18+)
+- Ruby 3.0 or later
+- Docker (for integration testing with kitchen-dokken)
+- VirtualBox 6.1 or later (for local testing with kitchen-vagrant)
 - GNU Make
+- Git 2.25 or later
 
 ### Setup Development Environment
 
@@ -32,9 +34,26 @@ This project adheres to a code of conduct. By participating, you are expected to
    cd nginx_cookbook
    ```
 
-2. Install dependencies:
+2. Install Ruby using your preferred version manager (rbenv, asdf, or system Ruby):
+   ```bash
+   # With asdf
+   asdf install ruby 3.2.3
+   asdf local ruby 3.2.3
+   
+   # With rbenv
+   rbenv install 3.2.3
+   rbenv local 3.2.3
    ```
+
+3. Install dependencies:
+   ```
+   gem install bundler
    bundle install
+   ```
+
+4. Initialize the Chef Policyfile:
+   ```
+   chef install Policyfile.rb
    ```
 
 ### Running Tests
@@ -42,10 +61,22 @@ This project adheres to a code of conduct. By participating, you are expected to
 The cookbook includes a comprehensive test suite:
 
 ```bash
+# Run style checks
+make style
+
+# Run unit tests
+make spec
+
+# Run integration tests with Docker (recommended for CI)
+make integration-docker
+
+# Run integration tests with Vagrant (for full OS compatibility testing)
+KITCHEN_YAML=.kitchen.vagrant.yml bundle exec kitchen test
+
 # Run all tests
 make all
 
-# Or run tests in Docker (recommended)
+# Run all tests in Docker
 make docker-all
 ```
 
@@ -55,10 +86,14 @@ Read [TESTING.md](TESTING.md) for more detailed information about the testing fr
 
 This cookbook follows the Chef community's coding standards:
 
-- Use ChefStyle for Ruby style guidelines
-- Follow Chef best practices for resource design
-- Write clear, maintainable code
-- Include thorough tests for any changes
+- Use Cookstyle for Ruby and Chef-specific style guidelines
+- All custom resources should include `unified_mode true`
+- Follow Chef Infra 18+ best practices for resource design
+- Write idempotent, platform-flexible code
+- Use helpers for platform-specific logic
+- Ensure backward compatibility where possible
+- Include thorough tests for any changes (unit tests with ChefSpec, integration tests with InSpec)
+- Document all custom resources, helpers, and complex recipes
 
 ## Git Commit Guidelines
 
@@ -77,11 +112,27 @@ Example: `feat: add SSL configuration options`
 
 ## Release Process
 
-1. Update the version in `metadata.rb` according to semantic versioning
-2. Update the CHANGELOG.md file
-3. Create a new Git tag matching the version
-4. Push the tag
-5. The CI/CD pipeline will handle testing and release
+We follow [Semantic Versioning](https://semver.org/) and [Keep a Changelog](https://keepachangelog.com/) principles:
+
+1. Update the version in `metadata.rb` according to semantic versioning:
+   - MAJOR version for incompatible API changes
+   - MINOR version for backwards-compatible functionality additions
+   - PATCH version for backwards-compatible bug fixes
+
+2. Update the CHANGELOG.md file with meaningful changes organized by type:
+   - Added
+   - Changed
+   - Deprecated
+   - Removed
+   - Fixed
+   - Security
+
+3. Submit a PR with these changes
+
+4. Once merged to main, maintainers will:
+   - Create a new Git tag matching the version
+   - Push the tag
+   - The CI/CD pipeline will handle testing and release to the Chef Supermarket
 
 ## Documentation
 

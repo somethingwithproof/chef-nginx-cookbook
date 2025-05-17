@@ -22,10 +22,10 @@ default['nginx']['security']['server_tokens'] = 'off'
 default['nginx']['security']['server_signature'] = 'off'
 default['nginx']['security']['client_body_buffer_size'] = '16k'
 default['nginx']['security']['client_max_body_size'] = '10m'
-default['nginx']['security']['hide_headers'] = [
-  'X-Powered-By',
-  'Server',
-]
+default['nginx']['security']['hide_headers'] = %w(
+  X-Powered-By
+  Server
+)
 default['nginx']['security']['add_headers'] = {
   'X-Content-Type-Options' => 'nosniff',
   'X-Frame-Options' => 'SAMEORIGIN',

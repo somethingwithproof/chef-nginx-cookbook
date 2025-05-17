@@ -17,11 +17,13 @@
 # limitations under the License.
 #
 
+unified_mode true
+
 property :version, String, default: lazy { node['nginx']['version'] }
 property :install_method, String, equal_to: %w(package source), default: lazy { node['nginx']['install_method'] }
 property :package_name, String, default: lazy { node['nginx']['package_name'] }
 property :source_url, String, default: lazy { node['nginx']['source']['url'] }
-property :source_checksum, [String, nil], default: nil
+property :source_checksum, [String, nil]
 property :configure_flags, Array, default: lazy { node['nginx']['source']['configure_flags'] }
 property :use_official_repo, [true, false], default: lazy { node['nginx']['repo']['use_official_repo'] }
 property :repo_url, String, default: lazy { node['nginx']['repo']['url'] }
@@ -47,15 +49,20 @@ action :install do
   case new_resource.install_method
   when 'package'
     if new_resource.use_official_repo
-      include_recipe 'apt' if platform_family?('debian')
-      include_recipe 'yum-epel' if platform_family?('rhel')
-      
+      apt_update 'update' if platform_family?('debian')
+      yum_repository 'epel' do
+        description 'Extra Packages for Enterprise Linux'
+        baseurl 'https://download.fedoraproject.org/pub/epel/$releasever/$basearch/'
+        gpgkey 'https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever'
+        enabled true
+        only_if { platform_family?('rhel') }
+      end
+
       # Set up official NGINX repository
       case node['platform_family']
       when 'debian'
         apt_repository 'nginx' do
           uri new_resource.repo_url
-          distribution node['lsb']['codename']
           components ['nginx']
           key new_resource.repo_key
           action :add
@@ -68,6 +75,15 @@ action :install do
           gpgcheck true
           gpgkey new_resource.repo_key
           enabled true
+          action :create
+        end
+      when 'suse'
+        # Create zypper repo file
+        zypper_repository 'nginx' do
+          description 'Official NGINX Repository'
+          baseurl new_resource.repo_url
+          gpgcheck true
+          gpgkey new_resource.repo_key
           action :create
         end
       end
@@ -85,14 +101,27 @@ action :install do
     end
 
     # Install required packages
-    package %w(libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev) do
-      action :install
-      only_if { platform_family?('debian') }
-    end
-
-    package %w(pcre pcre-devel zlib zlib-devel openssl openssl-devel) do
-      action :install
-      only_if { platform_family?('rhel', 'amazon') }
+    case node['platform_family']
+    when 'debian'
+      package %w(libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev) do
+        action :install
+      end
+    when 'rhel', 'amazon'
+      package %w(pcre pcre-devel zlib zlib-devel openssl openssl-devel) do
+        action :install
+      end
+    when 'suse'
+      package %w(pcre pcre-devel zlib zlib-devel libopenssl-devel) do
+        action :install
+      end
+    when 'freebsd'
+      package %w(pcre pcre2 zlib openssl) do
+        action :install
+      end
+    when 'mac_os_x'
+      package %w(pcre openssl) do
+        action :install
+      end
     end
 
     # Create directories if not present
@@ -122,24 +151,50 @@ action :install do
         make install
       EOH
 
-      not_if { ::File.exist?('/opt/nginx/sbin/nginx') && `/opt/nginx/sbin/nginx -v 2>&1` =~ /nginx\/#{new_resource.version}/ }
+      not_if { ::File.exist?('/opt/nginx/sbin/nginx') && `/opt/nginx/sbin/nginx -v 2>&1` =~ %r{nginx/#{new_resource.version}} }
     end
 
     # Create system service for source-based installation
-    template '/lib/systemd/system/nginx.service' do
-      source 'nginx.service.erb'
-      cookbook 'nginx'
-      owner 'root'
-      group 'root'
-      mode '0644'
-      variables(
-        binary: '/opt/nginx/sbin/nginx',
-        pid_file: '/run/nginx.pid'
-      )
-      notifies :run, 'execute[systemctl daemon-reload]', :immediately
-    end
+    if platform_family?('windows')
+      windows_service 'nginx' do
+        description 'Nginx Web Server'
+        binary_path_name "\"#{new_resource.binary}\" -p \"#{node['nginx']['conf_dir']}\""
+        startup_type :auto_start
+        action [:create, :start]
+      end
+    elsif platform_family?('mac_os_x')
+      template '/Library/LaunchDaemons/org.nginx.nginx.plist' do
+        source 'nginx.plist.erb'
+        cookbook 'nginx'
+        owner 'root'
+        group 'wheel'
+        mode '0644'
+        variables(
+          binary: new_resource.binary,
+          conf_dir: node['nginx']['conf_dir']
+        )
+        notifies :run, 'execute[load nginx plist]', :immediately
+      end
+      
+      execute 'load nginx plist' do
+        command 'launchctl load -w /Library/LaunchDaemons/org.nginx.nginx.plist'
+        action :nothing
+      end
+    else
+      template '/lib/systemd/system/nginx.service' do
+        source 'nginx.service.erb'
+        cookbook 'nginx'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        variables(
+          binary: '/opt/nginx/sbin/nginx',
+          pid_file: '/run/nginx.pid'
+        )
+        notifies :run, 'execute[systemctl daemon-reload]', :immediately
+      end
 
-    execute 'systemctl daemon-reload' do
+      execute 'systemctl daemon-reload' do
       command 'systemctl daemon-reload'
       action :nothing
     end
@@ -162,7 +217,7 @@ action :remove do
     package new_resource.package_name do
       action :remove
     end
-    
+
     # Remove repository if added
     if new_resource.use_official_repo
       case node['platform_family']
@@ -181,23 +236,23 @@ action :remove do
     service 'nginx' do
       action [:stop, :disable]
     end
-    
+
     # Remove source-built NGINX
     file '/opt/nginx/sbin/nginx' do
       action :delete
     end
-    
+
     file '/lib/systemd/system/nginx.service' do
       action :delete
       notifies :run, 'execute[systemctl daemon-reload]', :immediately
     end
-    
+
     execute 'systemctl daemon-reload' do
       command 'systemctl daemon-reload'
       action :nothing
     end
   end
-  
+
   # Remove conf directories
   %w(conf_dir sites_dir sites_enabled_dir).each do |dir|
     directory node['nginx'][dir] do
@@ -205,7 +260,7 @@ action :remove do
       recursive true
     end
   end
-  
+
   # Optionally remove logs
   directory node['nginx']['log_dir'] do
     action :delete

@@ -3,27 +3,33 @@ maintainer 'Thomas Vincent'
 maintainer_email 'thomasvincent@gmail.com'
 license 'Apache-2.0'
 description 'Installs and configures Nginx with comprehensive functionality'
-version '1.0.0'
-chef_version '>= 18.0'
+version '1.1.0'
+chef_version '>= 18.0', '< 19.0'
 source_url 'https://github.com/thomasvincent/chef-nginx-cookbook'
 issues_url 'https://github.com/thomasvincent/chef-nginx-cookbook/issues'
 
-supports 'ubuntu', '>= 20.04'
-supports 'debian', '>= 11.0'
-supports 'centos', '>= 8.0'
-supports 'redhat', '>= 8.0'
+# Ubuntu LTS releases
+supports 'ubuntu', '>= 18.04'
+# Debian
+supports 'debian', '>= 10.0'
+# RHEL
+supports 'redhat', '>= 7.0'
+# Amazon Linux
 supports 'amazon', '>= 2.0'
+# Rocky Linux (RHEL-compatible)
 supports 'rocky', '>= 8.0'
+# AlmaLinux (RHEL-compatible)
 supports 'alma', '>= 8.0'
-
-depends 'build-essential', '>= 8.2'
-depends 'yum-epel', '>= 4.1'
+# Oracle Enterprise Linux
+supports 'oracle', '>= 7.0'
+# SUSE Linux Enterprise Server
+supports 'suse', '>= 12.0'
+# FreeBSD
+supports 'freebsd', '>= 13.0'
+# Windows Server and Desktop
+supports 'windows', '>= 10'
+# macOS
+supports 'mac_os_x', '>= 12.0'
+# EPEL repository is now configured directly in the install resource
 depends 'apt', '>= 8.0'
-depends 'openssl', '>= 14.0'
 depends 'selinux', '>= 6.0'
-
-provides 'nginx::default'
-provides 'nginx::install'
-provides 'nginx::configure'
-provides 'nginx::service'
-provides 'nginx::sites'

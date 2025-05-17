@@ -4,7 +4,25 @@
       "Bash(chmod:*)",
       "Bash(rm:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(gh repo view:*)",
+      "Bash(make:*)",
+      "Bash(cookstyle:*)",
+      "Bash(bundle install)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(gem update:*)",
+      "Bash(sudo gem update:*)",
+      "Bash(ruby --version)",
+      "Bash(/opt/homebrew/opt/ruby/bin/bundle exec cookstyle)",
+      "Bash(/opt/homebrew/opt/ruby/bin/bundle exec cookstyle -a)",
+      "Bash(/opt/homebrew/opt/ruby/bin/bundle exec rspec spec/unit/recipes/default_spec.rb)",
+      "Bash(/opt/homebrew/opt/ruby/bin/bundle add syslog --group development)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }

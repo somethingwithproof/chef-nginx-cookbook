@@ -22,6 +22,15 @@ verifier:
     - junit:/tmp/kitchen/inspec-junit.xml
 
 platforms:
+  # Ubuntu platforms (LTS releases)
+  - name: ubuntu-18.04
+    driver:
+      image: dokken/ubuntu-18.04
+      pid_one_command: /bin/systemd
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install -y apt-transport-https ca-certificates ssl-cert
+
   - name: ubuntu-20.04
     driver:
       image: dokken/ubuntu-20.04
@@ -38,6 +47,15 @@ platforms:
         - RUN /usr/bin/apt-get update
         - RUN /usr/bin/apt-get install -y apt-transport-https ca-certificates ssl-cert
 
+  # Debian platforms
+  - name: debian-10
+    driver:
+      image: dokken/debian-10
+      pid_one_command: /bin/systemd
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install -y apt-transport-https ca-certificates ssl-cert
+
   - name: debian-11
     driver:
       image: dokken/debian-11
@@ -46,19 +64,86 @@ platforms:
         - RUN /usr/bin/apt-get update
         - RUN /usr/bin/apt-get install -y apt-transport-https ca-certificates ssl-cert
 
+  # RHEL platforms
+  - name: centos-7
+    driver:
+      image: dokken/centos-7
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN yum -y install openssl hostname
+
   - name: centos-stream-8
     driver:
       image: dokken/centos-stream-8
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
-        - RUN yum -y install openssl
+        - RUN yum -y install openssl hostname
 
+  # RHEL derivatives
   - name: almalinux-8
     driver:
       image: dokken/almalinux-8
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
         - RUN dnf -y install openssl hostname
+
+  - name: almalinux-9
+    driver:
+      image: dokken/almalinux-9
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN dnf -y install openssl hostname
+
+  - name: rocky-8
+    driver:
+      image: dokken/rocky-8
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN dnf -y install openssl hostname
+
+  - name: rocky-9
+    driver:
+      image: dokken/rocky-9
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN dnf -y install openssl hostname
+
+  - name: oraclelinux-7
+    driver:
+      image: dokken/oraclelinux-7
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN yum -y install openssl hostname
+
+  - name: oraclelinux-8
+    driver:
+      image: dokken/oraclelinux-8
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN dnf -y install openssl hostname
+
+  # Amazon Linux
+  - name: amazonlinux-2
+    driver:
+      image: dokken/amazonlinux-2
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN yum -y install openssl hostname
+
+  - name: amazonlinux-2023
+    driver:
+      image: dokken/amazonlinux-2023
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN yum -y install openssl hostname
+
+  # SUSE Linux Enterprise Server
+  - name: opensuse-leap-15
+    driver:
+      image: dokken/opensuse-leap-15
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN zypper install -y openssl
 
 suites:
   - name: default

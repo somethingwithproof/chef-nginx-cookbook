@@ -44,7 +44,7 @@ node['nginx']['sites'].each do |site_name, site_data|
     template site_data['template'] || 'site.conf.erb'
     cookbook site_data['cookbook'] || 'nginx'
     ssl_enabled site_data['ssl_enabled'] || false
-    
+
     if site_data['ssl_enabled']
       ssl_port site_data['ssl_port'] || 443
       ssl_protocols site_data['ssl_protocols'] || node['nginx']['security']['ssl_protocols']
@@ -54,18 +54,18 @@ node['nginx']['sites'].each do |site_name, site_data|
       ssl_chain site_data['ssl_chain'] if site_data['ssl_chain']
       redirect_http_to_https site_data['redirect_http_to_https'] || false
     end
-    
+
     custom_directives site_data['custom_directives'] if site_data['custom_directives']
     client_max_body_size site_data['client_max_body_size'] if site_data['client_max_body_size']
     proxy_pass site_data['proxy_pass'] if site_data['proxy_pass']
     proxy_set_header site_data['proxy_set_header'] if site_data['proxy_set_header']
     php_fpm_enabled site_data['php_fpm_enabled'] || false
     php_fpm_socket site_data['php_fpm_socket'] if site_data['php_fpm_socket']
-    
+
     health_check_enabled site_data['health_check_enabled'] || false
     health_check_path site_data['health_check_path'] || '/health'
     health_check_interval site_data['health_check_interval'] || '10s'
-    
+
     enable true
     action :create
   end

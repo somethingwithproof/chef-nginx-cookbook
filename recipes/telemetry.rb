@@ -97,7 +97,7 @@ if node['nginx']['telemetry']['prometheus']['enabled']
       user: node['nginx']['telemetry']['prometheus']['user'],
       group: node['nginx']['telemetry']['prometheus']['group'],
       binary_path: node['nginx']['telemetry']['prometheus']['exporter_binary'],
-      scrape_uri: "http://localhost/nginx_status",
+      scrape_uri: 'http://localhost/nginx_status',
       listen_address: ":#{node['nginx']['telemetry']['prometheus']['port']}",
       metrics: node['nginx']['telemetry']['prometheus']['metrics'].join(',')
     )
@@ -134,7 +134,7 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
         url = "#{node['nginx']['telemetry']['grafana']['url']}/api/dashboards/db"
         headers = {
           'Content-Type' => 'application/json',
-          'Authorization' => "Bearer #{node['nginx']['telemetry']['grafana']['api_key']}"
+          'Authorization' => "Bearer #{node['nginx']['telemetry']['grafana']['api_key']}",
         }
 
         # Get dashboard JSON - either import from Grafana.com or use a simpler local version
@@ -142,7 +142,7 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
           # Get dashboard from Grafana.com
           dashboard_url = "https://grafana.com/api/dashboards/#{node['nginx']['telemetry']['grafana']['dashboard_id']}/revisions/#{node['nginx']['telemetry']['grafana']['dashboard_revision']}/download"
           response = HTTParty.get(dashboard_url)
-          
+
           if response.code == 200
             dashboard_json = response.body
             # Update datasource
@@ -155,7 +155,7 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
             payload = {
               dashboard: dashboard['dashboard'],
               overwrite: true,
-              inputs: dashboard['__inputs']
+              inputs: dashboard['__inputs'],
             }
           else
             Chef::Log.error("Failed to download Grafana dashboard: #{response.code}")
@@ -167,7 +167,7 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
             dashboard: {
               id: nil,
               title: 'Nginx Metrics',
-              tags: ['nginx', 'prometheus', 'web'],
+              tags: %w(nginx prometheus web),
               timezone: 'browser',
               schemaVersion: 16,
               version: 1,
@@ -182,9 +182,9 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
                     {
                       expr: 'nginx_connections_active',
                       refId: 'A',
-                      legendFormat: 'Active Connections'
-                    }
-                  ]
+                      legendFormat: 'Active Connections',
+                    },
+                  ],
                 },
                 {
                   type: 'graph',
@@ -195,24 +195,24 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
                     {
                       expr: 'rate(nginx_http_requests_total[5m])',
                       refId: 'A',
-                      legendFormat: 'Requests/s'
-                    }
-                  ]
-                }
-              ]
+                      legendFormat: 'Requests/s',
+                    },
+                  ],
+                },
+              ],
             },
-            overwrite: true
+            overwrite: true,
           }
         end
 
         # Submit dashboard to Grafana
-        response = HTTParty.post(url, 
+        response = HTTParty.post(url,
           body: payload.to_json,
           headers: headers
         )
 
         if response.code == 200
-          Chef::Log.info("Grafana dashboard installed successfully")
+          Chef::Log.info('Grafana dashboard installed successfully')
         else
           Chef::Log.error("Failed to install Grafana dashboard: #{response.code} - #{response.body}")
         end

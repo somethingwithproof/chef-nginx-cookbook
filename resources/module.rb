@@ -17,14 +17,16 @@
 # limitations under the License.
 #
 
+unified_mode true
+
 property :module_name, String, name_property: true
-property :configuration, [String, nil], default: nil
+property :configuration, [String, nil]
 property :install_package, [true, false], default: true
 property :module_package_name, [String, nil], default: lazy { "nginx-module-#{module_name}" }
 property :module_config_file, String, default: lazy { "#{node['nginx']['modules_dir']}/#{module_name}.conf" }
 
 # For dynamic modules, the load directive
-property :module_path, [String, nil], default: nil
+property :module_path, [String, nil]
 property :module_priority, Integer, default: 50
 property :template, String, default: 'module.conf.erb'
 property :cookbook, String, default: 'nginx'

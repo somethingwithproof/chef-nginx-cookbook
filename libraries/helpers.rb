@@ -22,14 +22,8 @@ module Nginx
     module Helpers
       # Detects the platform family and returns appropriate paths
       def nginx_config_path
-        case node['platform_family']
-        when 'debian'
-          '/etc/nginx'
-        when 'rhel', 'amazon'
-          '/etc/nginx'
-        else
-          '/etc/nginx'
-        end
+        # All platforms use the same path for now, but this could be customized in the future
+        '/etc/nginx'
       end
 
       # Returns the correct user for the platform
@@ -101,5 +95,5 @@ module Nginx
 end
 
 # Make the helper methods available everywhere
-Chef::Recipe.include(Nginx::Cookbook::Helpers)
+Chef::DSL::Recipe.include(Nginx::Cookbook::Helpers)
 Chef::Resource.include(Nginx::Cookbook::Helpers)

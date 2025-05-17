@@ -42,6 +42,9 @@ tmp
 .kitchen.yml
 kitchen.yml
 .kitchen.dokken.yml
+.kitchen.vagrant.yml
+.kitchen.ec2.yml
+.kitchen.cloud.yml
 
 # VCS #
 #######
@@ -79,6 +82,20 @@ spec*
 DOCKER*
 LICENSE*
 README*
+TESTING*
+CONTRIBUTING*
+CHANGELOG*
+DEVELOPMENT*
+DOCKERFILE*
+docker-compose*
+.editorconfig
+Makefile
+.asdf*
+.tool-versions
+.ruby-version
+.ruby-gemset
+Policyfile.rb
+Policyfile.lock.json
 
 # SCM #
 #######

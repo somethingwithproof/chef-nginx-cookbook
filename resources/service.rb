@@ -17,9 +17,11 @@
 # limitations under the License.
 #
 
+unified_mode true
+
 property :service_name, String, default: lazy { node['nginx']['service_name'] }
-property :restart_command, [String, nil], default: nil
-property :reload_command, [String, nil], default: nil
+property :restart_command, [String, nil]
+property :reload_command, [String, nil]
 property :supports, Hash, default: { restart: true, reload: true, status: true }
 
 action :start do

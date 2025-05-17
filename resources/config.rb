@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+unified_mode true
+
 property :config_name, String, name_property: true
 property :source, String, required: true
 property :cookbook, String, default: 'nginx'

@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ruby:3.4-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -23,4 +23,8 @@ RUN mkdir -p /var/log/nginx /var/www/html /var/www/secure.example.com /var/www/s
 COPY . /nginx_cookbook
 WORKDIR /nginx_cookbook
 
-CMD ["/bin/bash"]
+# Install gems
+RUN gem install bundler && \
+    bundle install
+
+CMD ["bundle", "exec", "rspec"]

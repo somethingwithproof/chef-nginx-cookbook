@@ -10,7 +10,7 @@ end
 describe file('/etc/nginx/conf.d/status.conf') do
   it { should exist }
   it { should be_file }
-  its('content') { should match /location \/nginx_status/ }
+  its('content') { should match %r{location /nginx_status} }
   its('content') { should match /stub_status on;/ }
 end
 
@@ -29,13 +29,13 @@ end
 
 # Test headers_more module if available on the platform
 # This is a conditional test as it may not be available on all platforms
-describe file('/etc/nginx/modules-enabled/headers-more-filter.conf'), :if => os.debian? || os.ubuntu? do
+describe file('/etc/nginx/modules-enabled/headers-more-filter.conf'), if: os.debian? || os.ubuntu? do
   it { should exist }
   it { should be_file }
 end
 
 # On RHEL-based systems, the module file might be in a different location
-describe file('/etc/nginx/conf.d/headers-more-filter.conf'), :if => os.redhat? || os.name == 'amazon' do
+describe file('/etc/nginx/conf.d/headers-more-filter.conf'), if: os.redhat? || os.name == 'amazon' do
   it { should exist }
   it { should be_file }
 end

@@ -1,11 +1,10 @@
 ---
 driver:
-  name: docker
-  use_sudo: false
-  privileged: true
-  provision_command:
-    - sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config
-    - systemctl enable sshd.service
+  name: vagrant
+  customize:
+    memory: 1024
+    cpus: 2
+  provider: virtualbox
 
 provisioner:
   name: chef_zero
@@ -19,65 +18,30 @@ verifier:
   name: inspec
 
 platforms:
-  # Ubuntu platforms
+  # Ubuntu platforms (LTS releases)
   - name: ubuntu-18.04
-    driver_config:
-      run_command: /bin/systemd
   - name: ubuntu-20.04
-    driver_config:
-      run_command: /bin/systemd
   - name: ubuntu-22.04
-    driver_config:
-      run_command: /bin/systemd
   
   # Debian platforms
   - name: debian-10
-    driver_config:
-      run_command: /bin/systemd
   - name: debian-11
-    driver_config:
-      run_command: /bin/systemd
-  
-  # RHEL platforms
-  - name: centos-7
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
-  - name: centos-stream-8
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
   
   # RHEL derivatives
-  - name: almalinux-8
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
+  - name: centos-7
+  - name: centos-stream-8
+  - name: rockylinux-8
   - name: almalinux-9
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
-  - name: rocky-8
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
-  - name: rocky-9
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
-  - name: oraclelinux-7
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
-  - name: oraclelinux-8
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
   
-  # Amazon Linux
-  - name: amazonlinux-2
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
-  - name: amazonlinux-2023
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
+  # Windows platforms
+  - name: windows-2019
+    transport:
+      name: winrm
+      elevated: true
   
-  # SUSE Linux Enterprise Server
-  - name: opensuse-leap-15
-    driver_config:
-      run_command: /usr/lib/systemd/systemd
+  # macOS platforms
+  - name: macos-11
+    provider: parallels
 
 suites:
   - name: default
@@ -113,6 +77,9 @@ suites:
     provisioner:
       client_rb:
         ssl_verify_mode: :verify_none
+    excludes:
+      - windows-2019
+      - macos-11
 
   - name: multi-site
     run_list:
@@ -134,6 +101,9 @@ suites:
     provisioner:
       multiple_converge: 2
       enforce_idempotency: true
+    excludes:
+      - windows-2019
+      - macos-11
 
   - name: performance-tuning
     run_list:
@@ -159,6 +129,9 @@ suites:
           open_file_cache_errors: 'on'
           gzip: 'on'
           gzip_comp_level: 4
+    excludes:
+      - windows-2019
+      - macos-11
 
   - name: modules
     run_list:
@@ -181,3 +154,6 @@ suites:
             module_name: 'headers-more-filter'
             install_package: true
             module_package_name: 'libnginx-mod-http-headers-more-filter'
+    excludes:
+      - windows-2019
+      - macos-11
