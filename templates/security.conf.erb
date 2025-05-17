@@ -1,0 +1,22 @@
+# Security configuration
+
+# Connection limits
+limit_conn_zone <%= @limit_conn_zone %>;
+limit_conn <%= @limit_conn %>;
+
+# Request limits
+limit_req_zone <%= @limit_req_zone %>;
+limit_req <%= @limit_req %>;
+
+# Security headers
+<% @add_headers.each do |name, value| %>
+add_header <%= name %> "<%= value %>";
+<% end %>
+
+# Hide headers
+<% @hide_headers.each do |header| %>
+proxy_hide_header <%= header %>;
+<% end %>
+
+# Don't show nginx version in error pages
+server_tokens off;

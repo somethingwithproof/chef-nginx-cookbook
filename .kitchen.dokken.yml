@@ -1,0 +1,168 @@
+---
+driver:
+  name: dokken
+  privileged: true
+  chef_version: 18
+  env: [CHEF_LICENSE=accept]
+
+transport:
+  name: dokken
+
+provisioner:
+  name: dokken
+  chef_license: accept
+  product_name: chef
+  product_version: 18
+  chef_log_level: warn
+
+verifier:
+  name: inspec
+  reporter:
+    - cli
+    - junit:/tmp/kitchen/inspec-junit.xml
+
+platforms:
+  - name: ubuntu-20.04
+    driver:
+      image: dokken/ubuntu-20.04
+      pid_one_command: /bin/systemd
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install -y apt-transport-https ca-certificates ssl-cert
+
+  - name: ubuntu-22.04
+    driver:
+      image: dokken/ubuntu-22.04
+      pid_one_command: /bin/systemd
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install -y apt-transport-https ca-certificates ssl-cert
+
+  - name: debian-11
+    driver:
+      image: dokken/debian-11
+      pid_one_command: /bin/systemd
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install -y apt-transport-https ca-certificates ssl-cert
+
+  - name: centos-stream-8
+    driver:
+      image: dokken/centos-stream-8
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN yum -y install openssl
+
+  - name: almalinux-8
+    driver:
+      image: dokken/almalinux-8
+      pid_one_command: /usr/lib/systemd/systemd
+      intermediate_instructions:
+        - RUN dnf -y install openssl hostname
+
+suites:
+  - name: default
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+      nginx:
+        default_site_enabled: true
+        telemetry:
+          enabled: false
+
+  - name: ssl
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/ssl
+      controls:
+        - nginx-01
+        - nginx-02
+        - nginx-03
+    attributes:
+      nginx:
+        sites:
+          secure.example.com:
+            port: 80
+            ssl_enabled: true
+            ssl_port: 443
+            ssl_cert: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+            ssl_key: '/etc/ssl/private/ssl-cert-snakeoil.key'
+            ssl_protocols: 'TLSv1.2 TLSv1.3'
+            redirect_http_to_https: true
+            root: '/var/www/secure.example.com'
+    provisioner:
+      client_rb:
+        ssl_verify_mode: :verify_none
+
+  - name: multi-site
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/multi-site
+    attributes:
+      nginx:
+        sites:
+          site1.example.com:
+            port: 80
+            root: '/var/www/site1.example.com'
+            server_name: 'site1.example.com'
+          site2.example.com:
+            port: 80
+            root: '/var/www/site2.example.com'
+            server_name: 'site2.example.com'
+    provisioner:
+      multiple_converge: 2
+      enforce_idempotency: true
+
+  - name: performance-tuning
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/performance-tuning
+    attributes:
+      nginx:
+        performance:
+          worker_processes: 'auto'
+          worker_connections: 4096
+          worker_rlimit_nofile: 8192
+          multi_accept: 'on'
+          keepalive_timeout: 30
+          keepalive_requests: 200
+          sendfile: 'on'
+          tcp_nopush: 'on'
+          tcp_nodelay: 'on'
+          open_file_cache: 'max=10000 inactive=30s'
+          open_file_cache_valid: '60s'
+          open_file_cache_min_uses: 2
+          open_file_cache_errors: 'on'
+          gzip: 'on'
+          gzip_comp_level: 4
+
+  - name: modules
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/modules
+    attributes:
+      nginx:
+        modules:
+          status:
+            module_name: 'status'
+            configuration: |
+              location /nginx_status {
+                stub_status on;
+                allow 127.0.0.1;
+                deny all;
+              }
+          headers_more:
+            module_name: 'headers-more-filter'
+            install_package: true
+            module_package_name: 'libnginx-mod-http-headers-more-filter'

@@ -1,0 +1,22 @@
+# SSL configuration
+
+# Protocols and ciphers
+ssl_protocols <%= @ssl_protocols %>;
+ssl_ciphers <%= @ssl_ciphers %>;
+ssl_prefer_server_ciphers <%= @ssl_prefer_server_ciphers %>;
+
+# Session settings
+ssl_session_tickets <%= @ssl_session_tickets %>;
+ssl_session_timeout <%= @ssl_session_timeout %>;
+ssl_session_cache <%= @ssl_session_cache %>;
+
+<% if @ssl_dhparam %>
+# DH parameters
+ssl_dhparam <%= @ssl_dhparam %>;
+<% end %>
+
+<% if @ssl_stapling == 'on' %>
+# OCSP stapling
+ssl_stapling <%= @ssl_stapling %>;
+ssl_stapling_verify <%= @ssl_stapling_verify %>;
+<% end %>

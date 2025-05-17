@@ -1,0 +1,94 @@
+# Put files/directories that should be ignored in this file when uploading
+# to a Chef Infra Server or Supermarket.
+# Lines that start with '# ' are comments.
+
+# OS generated files #
+######################
+.DS_Store
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# SASS #
+########
+.sass-cache
+
+# EDITORS #
+###########
+.#*
+.project
+.settings
+*_flymake
+*_flymake.*
+*.bak
+*.sw[a-z]
+*.tmproj
+*~
+\#*
+CHEFKNIFE.rb
+MKTMPDIR*
+TAGS*
+
+# COMPILED #
+###########
+a.out
+mkmf.log
+tmp
+
+# KITCHEN #
+##########
+.kitchen/
+.kitchen.local.yml
+.kitchen.yml
+kitchen.yml
+.kitchen.dokken.yml
+
+# VCS #
+#######
+.git
+.bzr
+.hg
+.svn
+*/.bzr/*
+*/.git/*
+*/.hg/*
+*/.svn/*
+
+# TRAVIS #
+#########
+.travis.yml
+
+# Documentation and tests #
+###########################
+features/*
+spec/*
+docs/*
+examples/*
+Gemfile*
+Rakefile*
+spec*
+.rubocop.yml
+.rspec
+.watchr
+.github/
+.circleci/
+.coveralls.yml
+.foodcritic
+.travis.yml
+.yamllint
+DOCKER*
+LICENSE*
+README*
+
+# SCM #
+#######
+.gitattributes
+.gitconfig
+.gitignore
+.gitkeep
+.gitmodules
+
+# Vagrant #
+###########
+.vagrant
+Vagrantfile

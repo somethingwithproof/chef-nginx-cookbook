@@ -1,0 +1,8 @@
+# Module: <%= @module_name %>
+<% if @module_path -%>
+load_module "<%= @module_path %>";
+<% end -%>
+
+<% if @configuration -%>
+<%= @configuration %>
+<% end -%>

@@ -1,0 +1,139 @@
+---
+driver:
+  name: docker
+  use_sudo: false
+  privileged: true
+  provision_command:
+    - sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config
+    - systemctl enable sshd.service
+
+provisioner:
+  name: chef_zero
+  product_name: chef
+  product_version: 18
+  chef_license: accept
+  client_rb:
+    chef_license: accept-no-persist
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: ubuntu-20.04
+    driver_config:
+      run_command: /lib/systemd/systemd
+  - name: ubuntu-22.04
+    driver_config:
+      run_command: /lib/systemd/systemd
+  - name: debian-11
+    driver_config:
+      run_command: /lib/systemd/systemd
+  - name: centos-stream-8
+    driver_config:
+      run_command: /usr/lib/systemd/systemd
+  - name: almalinux-8
+    driver_config:
+      run_command: /usr/lib/systemd/systemd
+
+suites:
+  - name: default
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+      nginx:
+        default_site_enabled: true
+        telemetry:
+          enabled: false
+
+  - name: ssl
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/ssl
+    attributes:
+      nginx:
+        sites:
+          secure.example.com:
+            port: 80
+            ssl_enabled: true
+            ssl_port: 443
+            ssl_cert: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+            ssl_key: '/etc/ssl/private/ssl-cert-snakeoil.key'
+            ssl_protocols: 'TLSv1.2 TLSv1.3'
+            redirect_http_to_https: true
+            root: '/var/www/secure.example.com'
+    provisioner:
+      client_rb:
+        ssl_verify_mode: :verify_none
+
+  - name: multi-site
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/multi-site
+    attributes:
+      nginx:
+        sites:
+          site1.example.com:
+            port: 80
+            root: '/var/www/site1.example.com'
+            server_name: 'site1.example.com'
+          site2.example.com:
+            port: 80
+            root: '/var/www/site2.example.com'
+            server_name: 'site2.example.com'
+    provisioner:
+      multiple_converge: 2
+      enforce_idempotency: true
+
+  - name: performance-tuning
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/performance-tuning
+    attributes:
+      nginx:
+        performance:
+          worker_processes: 'auto'
+          worker_connections: 4096
+          worker_rlimit_nofile: 8192
+          multi_accept: 'on'
+          keepalive_timeout: 30
+          keepalive_requests: 200
+          sendfile: 'on'
+          tcp_nopush: 'on'
+          tcp_nodelay: 'on'
+          open_file_cache: 'max=10000 inactive=30s'
+          open_file_cache_valid: '60s'
+          open_file_cache_min_uses: 2
+          open_file_cache_errors: 'on'
+          gzip: 'on'
+          gzip_comp_level: 4
+
+  - name: modules
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/modules
+    attributes:
+      nginx:
+        modules:
+          status:
+            module_name: 'status'
+            configuration: |
+              location /nginx_status {
+                stub_status on;
+                allow 127.0.0.1;
+                deny all;
+              }
+          headers_more:
+            module_name: 'headers-more-filter'
+            install_package: true
+            module_package_name: 'libnginx-mod-http-headers-more-filter'

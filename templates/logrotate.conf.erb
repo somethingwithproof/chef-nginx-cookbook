@@ -1,0 +1,20 @@
+<% @logs.each do |log| -%>
+<%= log %> {
+<% end -%>
+    <%= @frequency %>
+    missingok
+    rotate <%= @rotate %>
+    compress
+    delaycompress
+    notifempty
+<% if @options -%>
+<% @options.each do |option| -%>
+    <%= option %>
+<% end -%>
+<% end -%>
+    create 0640 <%= @user %> <%= @group %>
+    sharedscripts
+    postrotate
+        <%= @postrotate %>
+    endscript
+}

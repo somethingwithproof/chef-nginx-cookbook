@@ -1,0 +1,83 @@
+---
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Cookstyle
+        run: make style
+      - name: Unit Tests
+        run: make spec
+
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Run yaml Lint
+        uses: actionshub/yamllint@main
+
+  mdl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Run Markdown Lint
+        uses: actionshub/markdownlint@main
+
+  kitchen:
+    needs: [delivery, yamllint, mdl]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: ['ubuntu-2004', 'ubuntu-2204', 'debian-11']
+        suite: ['default', 'ssl', 'multi-site', 'performance-tuning', 'modules']
+      fail-fast: false
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+      - name: Run Tests with Dokken
+        run: make integration-dokken
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: .kitchen.dokken.yml
+          SUITE: ${{ matrix.suite }}
+          PLATFORM: ${{ matrix.os }}
+
+  release:
+    needs: [kitchen]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Semantic Release
+        uses: brpaz/semantic-release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+            @semantic-release/github
+          extra_plugins: |
+            conventional-changelog-conventionalcommits

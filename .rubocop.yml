@@ -1,0 +1,72 @@
+AllCops:
+  Exclude:
+    - 'vendor/**/*'
+    - 'spec/fixtures/**/*'
+    - 'tmp/**/*'
+    - '.git/**/*'
+    - 'bin/**/*'
+    - 'Guardfile'
+  NewCops: enable
+
+ChefStyle/FileMode:
+  Enabled: true
+  EnforcedStyle: numeric
+
+ChefModernize/LibarchiveFileResource:
+  Enabled: true
+
+ChefCorrectness/ChefApplicationFatal:
+  Enabled: true
+
+ChefCorrectness/InvalidPlatformMetadata:
+  Enabled: true
+
+ChefCorrectness/InvalidPlatformFamilyMetadata:
+  Enabled: true
+
+ChefCorrectness/MissingPlatformMetadata:
+  Enabled: true
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/BlockLength:
+  Max: 50
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+    - 'libraries/**/*'
+    - 'resources/**/*'
+
+Metrics/ClassLength:
+  Max: 150
+
+Metrics/CyclomaticComplexity:
+  Max: 12
+
+Metrics/MethodLength:
+  Max: 40
+
+Metrics/ModuleLength:
+  Max: 150
+
+Metrics/ParameterLists:
+  Max: 7
+
+Naming/FileName:
+  Exclude:
+    - 'libraries/**/*'
+    - 'spec/**/*'
+    - 'test/**/*'
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/NumericPredicate:
+  EnforcedStyle: comparison
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma

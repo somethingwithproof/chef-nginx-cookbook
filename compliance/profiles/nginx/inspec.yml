@@ -1,0 +1,14 @@
+name: nginx
+title: InSpec Profile for NGINX
+maintainer: Thomas Vincent
+copyright: Thomas Vincent
+copyright_email: thomasvincent@gmail.com
+license: Apache-2.0
+summary: An InSpec Compliance Profile for NGINX
+version: 0.1.0
+supports:
+  platform: os
+depends:
+  - name: nginx-baseline
+    git: https://github.com/dev-sec/nginx-baseline
+    tag: 2.4.0

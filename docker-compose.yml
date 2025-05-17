@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  test-ubuntu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/nginx_cookbook
+    command: >
+      bash -c "cd /nginx_cookbook && \
+              chef-client -z -o nginx::default -c /nginx_cookbook/client.rb && \
+              inspec exec /nginx_cookbook/test/integration/default"
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+
+  test-kitchen:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/nginx_cookbook
+    command: bash -c "cd /nginx_cookbook && bundle exec kitchen test -d always"
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+
+  test-dokken:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/nginx_cookbook
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: bash -c "cd /nginx_cookbook && KITCHEN_YAML=.kitchen.dokken.yml bundle exec kitchen test -d always"
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
