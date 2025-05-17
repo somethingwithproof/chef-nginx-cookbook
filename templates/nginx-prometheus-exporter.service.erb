@@ -1,0 +1,25 @@
+[Unit]
+Description=Prometheus Nginx Exporter
+Documentation=https://github.com/nginxinc/nginx-prometheus-exporter
+After=network.target
+
+[Service]
+User=prometheus
+ExecStart=/usr/local/bin/nginx-prometheus-exporter \
+          -nginx.scrape-uri=<%= @scrape_uri %> \
+          -web.telemetry-path=<%= @telemetry_path %>
+Restart=on-failure
+RestartSec=5s
+
+# Security enhancements
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target

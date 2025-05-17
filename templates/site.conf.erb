@@ -1,0 +1,35 @@
+server {
+    listen <%= @port %>;
+    server_name <%= @server_name %>;
+    
+    root <%= @root %>;
+    
+    access_log <%= @access_log %>;
+    error_log <%= @error_log %>;
+    
+    # Main location
+    location / {
+        try_files $uri $uri/ =404;
+        index index.html index.htm;
+    }
+    
+    <% if @custom_directives %>
+    # Custom directives
+    <%= @custom_directives %>
+    <% end %>
+    
+    <% if defined?(@ssl_enabled) && @ssl_enabled %>
+    # SSL configuration
+    ssl on;
+    ssl_certificate <%= @ssl_cert %>;
+    ssl_certificate_key <%= @ssl_key %>;
+    ssl_protocols <%= @ssl_protocols %>;
+    ssl_ciphers <%= @ssl_ciphers %>;
+    ssl_prefer_server_ciphers on;
+    
+    <% if defined?(@hsts_enabled) && @hsts_enabled %>
+    # HSTS
+    add_header Strict-Transport-Security "max-age=<%= @hsts_max_age %><% if @hsts_include_subdomains %>; includeSubDomains<% end %><% if @hsts_preload %>; preload<% end %>";
+    <% end %>
+    <% end %>
+}
