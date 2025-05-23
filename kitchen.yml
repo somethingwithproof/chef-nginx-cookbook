@@ -22,7 +22,7 @@ provisioner:
   multiple_converge: 2
   deprecations_as_errors: true
   log_level: info
-  retry_on_exit_code: 
+  retry_on_exit_code:
     - 35 # Service restart might cause temporary failures
   max_retries: 2
   wait_for_retry: 120
@@ -50,7 +50,7 @@ platforms:
       intermediate_instructions:
         - RUN /usr/bin/apt-get update
         - RUN apt-get install -y lsb-release curl gnupg2 systemd ca-certificates
-        
+
   - name: ubuntu-24.04
     driver:
       image: dokken/ubuntu-24.04
@@ -66,7 +66,7 @@ platforms:
       intermediate_instructions:
         - RUN /usr/bin/apt-get update
         - RUN apt-get install -y lsb-release curl gnupg2 ca-certificates
-        
+
   - name: debian-12
     driver:
       image: dokken/debian-12
@@ -81,7 +81,7 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
         - RUN yum -y install initscripts systemd-sysv which lsof
-        
+
   - name: rockylinux-9
     driver:
       image: dokken/rockylinux-9
@@ -95,7 +95,7 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
         - RUN yum -y install initscripts systemd-sysv which lsof
-        
+
   - name: almalinux-9
     driver:
       image: dokken/almalinux-9
@@ -109,7 +109,7 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
         - RUN yum -y install systemd-sysv initscripts shadow-utils
-        
+
   - name: amazonlinux-2023
     driver:
       image: dokken/amazonlinux-2023
@@ -192,9 +192,9 @@ suites:
         default_site:
           enabled: true
         performance:
-          worker_processes: 'auto'
+          worker_processes: "auto"
           worker_connections: 1024
           open_file_cache_max: 1000
-          open_file_cache_inactive: '20s'
+          open_file_cache_inactive: "20s"
           keepalive_timeout: 65
-          client_max_body_size: '10m'
+          client_max_body_size: "10m"

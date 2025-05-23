@@ -22,7 +22,6 @@ case node['platform_family']
 when 'debian'
   apt_repository 'nginx' do
     uri 'https://nginx.org/packages/debian/'
-    distribution node['lsb']['codename']
     components ['nginx']
     key 'https://nginx.org/keys/nginx_signing.key'
     action :add
@@ -39,7 +38,7 @@ when 'rhel', 'amazon'
     only_if { node['nginx']['install_method'] == 'package' }
   end
 
-  include_recipe 'yum-epel::default' if node['platform_family'] == 'rhel'
+  include_recipe 'yum-epel::default' if platform_family?('rhel')
 end
 
 # Install nginx package

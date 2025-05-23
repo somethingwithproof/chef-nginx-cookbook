@@ -54,7 +54,7 @@ end
 default['nginx']['source']['url'] = "https://nginx.org/download/nginx-#{node['nginx']['version']}.tar.gz"
 default['nginx']['source']['checksum'] = nil # Auto-generated
 default['nginx']['source']['prefix'] = '/usr/local/nginx'
-default['nginx']['source']['configure_options'] = %w(
+default['nginx']['source']['configure_options'] = %w[
   --with-http_ssl_module
   --with-http_v2_module
   --with-http_realip_module
@@ -72,33 +72,33 @@ default['nginx']['source']['configure_options'] = %w(
   --with-mail_ssl_module
   --with-file-aio
   --with-threads
-)
+]
 default['nginx']['source']['dependencies'] = case node['platform_family']
-                                           when 'rhel', 'fedora', 'amazon'
-                                             %w(
-                                               openssl-devel
-                                               pcre-devel
-                                               zlib-devel
-                                               libxml2-devel
-                                               libxslt-devel
-                                               gd-devel
-                                               perl-devel
-                                               perl-ExtUtils-Embed
-                                               gperftools-devel
-                                             )
-                                           when 'debian'
-                                             %w(
-                                               libssl-dev
-                                               libpcre3-dev
-                                               zlib1g-dev
-                                               libxml2-dev
-                                               libxslt1-dev
-                                               libgd-dev
-                                               libperl-dev
-                                               libgeoip-dev
-                                               libgoogle-perftools-dev
-                                             )
-                                           end
+                                             when 'rhel', 'fedora', 'amazon'
+                                               %w[
+                                                 openssl-devel
+                                                 pcre-devel
+                                                 zlib-devel
+                                                 libxml2-devel
+                                                 libxslt-devel
+                                                 gd-devel
+                                                 perl-devel
+                                                 perl-ExtUtils-Embed
+                                                 gperftools-devel
+                                               ]
+                                             when 'debian'
+                                               %w[
+                                                 libssl-dev
+                                                 libpcre3-dev
+                                                 zlib1g-dev
+                                                 libxml2-dev
+                                                 libxslt1-dev
+                                                 libgd-dev
+                                                 libperl-dev
+                                                 libgeoip-dev
+                                                 libgoogle-perftools-dev
+                                               ]
+                                             end
 
 # Performance tuning
 cpu_count = node['cpu'] ? node['cpu']['total'].to_i : 2
@@ -129,7 +129,7 @@ default['nginx']['config']['server_names_hash_max_size'] = 512
 default['nginx']['config']['server_tokens'] = 'off'
 default['nginx']['config']['log_format'] = {
   'main' => '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for"',
-  'json' => '{"time":"$time_local","remote_addr":"$remote_addr","remote_user":"$remote_user","request":"$request","status":$status,"body_bytes_sent":$body_bytes_sent,"request_time":$request_time,"http_referrer":"$http_referer","http_user_agent":"$http_user_agent","http_x_forwarded_for":"$http_x_forwarded_for"}',
+  'json' => '{"time":"$time_local","remote_addr":"$remote_addr","remote_user":"$remote_user","request":"$request","status":$status,"body_bytes_sent":$body_bytes_sent,"request_time":$request_time,"http_referrer":"$http_referer","http_user_agent":"$http_user_agent","http_x_forwarded_for":"$http_x_forwarded_for"}'
 }
 default['nginx']['config']['access_log'] = 'on'
 default['nginx']['config']['error_log'] = 'warn'
@@ -143,18 +143,19 @@ default['nginx']['security']['add_headers'] = {
   'X-Frame-Options' => 'SAMEORIGIN',
   'X-Content-Type-Options' => 'nosniff',
   'X-XSS-Protection' => '1; mode=block',
-  'Referrer-Policy' => 'strict-origin-when-cross-origin',
+  'Referrer-Policy' => 'strict-origin-when-cross-origin'
 }
-default['nginx']['security']['hide_headers'] = [
-  'Server',
-  'X-Powered-By',
+default['nginx']['security']['hide_headers'] = %w[
+  Server
+  X-Powered-By
 ]
 
 # SSL/TLS Configuration
 default['nginx']['ssl']['enabled'] = true
 default['nginx']['ssl']['port'] = 443
 default['nginx']['ssl']['protocols'] = 'TLSv1.2 TLSv1.3'
-default['nginx']['ssl']['ciphers'] = 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
+default['nginx']['ssl']['ciphers'] =
+  'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
 default['nginx']['ssl']['prefer_server_ciphers'] = 'off'
 default['nginx']['ssl']['session_tickets'] = 'off'
 default['nginx']['ssl']['session_timeout'] = '1d'
@@ -165,21 +166,21 @@ default['nginx']['ssl']['certificate'] = nil
 default['nginx']['ssl']['certificate_key'] = nil
 default['nginx']['ssl']['dhparam'] = nil
 default['nginx']['ssl']['hsts'] = true
-default['nginx']['ssl']['hsts_max_age'] = 15768000
+default['nginx']['ssl']['hsts_max_age'] = 15_768_000
 default['nginx']['ssl']['hsts_include_subdomains'] = true
 default['nginx']['ssl']['hsts_preload'] = false
 default['nginx']['ssl']['redirect_http_to_https'] = true
 
 # Default modules to enable
-default['nginx']['modules'] = %w(
+default['nginx']['modules'] = %w[
   http_ssl
   http_v2
   http_gzip_static
   http_stub_status
-)
+]
 
 # Default modules to disable
-default['nginx']['disabled_modules'] = %w()
+default['nginx']['disabled_modules'] = %w[]
 
 # Default site
 default['nginx']['default_site'] = {
@@ -188,7 +189,7 @@ default['nginx']['default_site'] = {
   'server_name' => node['fqdn'] || 'localhost',
   'error_log' => 'logs/error.log',
   'access_log' => 'logs/access.log combined',
-  'enabled' => true,
+  'enabled' => true
 }
 
 # Define sites to create (empty by default)
@@ -211,18 +212,18 @@ end
 # Firewall configuration
 default['nginx']['firewall']['enabled'] = true
 default['nginx']['firewall']['allow_ports'] = [80, 443]
-default['nginx']['firewall']['source_addresses'] = %w(0.0.0.0/0 ::/0)
+default['nginx']['firewall']['source_addresses'] = %w[0.0.0.0/0 ::/0]
 
 # Monitoring configuration
 default['nginx']['monitoring']['status_path'] = '/nginx_status'
 default['nginx']['monitoring']['restricted_access'] = true
-default['nginx']['monitoring']['allowed_ips'] = %w(127.0.0.1 ::1)
+default['nginx']['monitoring']['allowed_ips'] = %w[127.0.0.1 ::1]
 
 # Logging
 default['nginx']['logrotate']['enabled'] = true
 default['nginx']['logrotate']['rotate'] = 52
 default['nginx']['logrotate']['frequency'] = 'weekly'
-default['nginx']['logrotate']['options'] = %w(missingok compress delaycompress notifempty create)
+default['nginx']['logrotate']['options'] = %w[missingok compress delaycompress notifempty create]
 default['nginx']['logrotate']['postrotate'] = '/bin/systemctl reload nginx.service > /dev/null 2>&1 || true'
 
 # Health check
@@ -235,14 +236,14 @@ default['nginx']['telemetry']['enabled'] = false
 default['nginx']['telemetry']['prometheus']['enabled'] = true
 default['nginx']['telemetry']['prometheus']['scrape_uri'] = '/nginx_status'
 default['nginx']['telemetry']['prometheus']['telemetry_path'] = '/metrics'
-default['nginx']['telemetry']['prometheus']['metrics'] = %w(
+default['nginx']['telemetry']['prometheus']['metrics'] = %w[
   connections
   requests
   http
   ssl
   upstreams
-)
-default['nginx']['telemetry']['prometheus']['allow_ips'] = %w(127.0.0.1 ::1)
+]
+default['nginx']['telemetry']['prometheus']['allow_ips'] = %w[127.0.0.1 ::1]
 default['nginx']['telemetry']['grafana']['enabled'] = false
 default['nginx']['telemetry']['grafana']['url'] = 'http://localhost:3000'
 default['nginx']['telemetry']['grafana']['datasource'] = 'Prometheus'
