@@ -78,13 +78,13 @@ node['nginx']['sites'].each do |site_name, site_data|
   site_config = "#{site_name}.conf"
   site_available_path = platform_family?('debian') ? "#{node['nginx']['sites_available_dir']}/#{site_config}" : "#{node['nginx']['sites_dir']}/#{site_config}"
   site_enabled_path = "#{node['nginx']['sites_dir']}/#{site_config}"
-  
+
   # Set SSL default values
   if site_data['ssl_enabled'] && (site_data['ssl_cert'].nil? || site_data['ssl_key'].nil?)
     site_data['ssl_cert'] = node['nginx']['ssl']['certificate']
     site_data['ssl_key'] = node['nginx']['ssl']['certificate_key']
   end
-  
+
   # Create the site configuration
   template site_available_path do
     source 'site.conf.erb'
@@ -112,7 +112,7 @@ node['nginx']['sites'].each do |site_name, site_data|
     )
     notifies :reload, 'service[nginx]', :delayed
   end
-  
+
   # Create document root directory if it doesn't exist
   directory site_data['root'] || "/var/www/#{site_name}" do
     owner node['nginx']['user']
@@ -122,13 +122,13 @@ node['nginx']['sites'].each do |site_name, site_data|
     action :create
     not_if { ::File.directory?(site_data['root'] || "/var/www/#{site_name}") }
   end
-  
+
   # Enable the site for Debian-based distributions
-  if platform_family?('debian')
-    link site_enabled_path do
-      to site_available_path
-      action :create
-      notifies :reload, 'service[nginx]', :delayed
-    end
+  next unless platform_family?('debian')
+
+  link site_enabled_path do
+    to site_available_path
+    action :create
+    notifies :reload, 'service[nginx]', :delayed
   end
 end

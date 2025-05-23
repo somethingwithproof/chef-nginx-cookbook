@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 name 'nginx'
 maintainer 'Thomas Vincent'
 maintainer_email 'thomasvincent@example.com'
@@ -15,15 +17,6 @@ supports 'redhat', '>= 8.0'
 supports 'amazon', '>= 2.0'
 supports 'rocky', '>= 8.0'
 supports 'alma', '>= 8.0'
-
-depends 'build-essential', '>= 8.2'
 depends 'yum-epel', '>= 4.1'
 depends 'apt', '>= 8.0'
-depends 'openssl', '>= 14.0'
 depends 'selinux', '>= 6.0'
-
-provides 'nginx::default'
-provides 'nginx::install'
-provides 'nginx::configure'
-provides 'nginx::service'
-provides 'nginx::sites'

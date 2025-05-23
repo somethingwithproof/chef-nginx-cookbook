@@ -19,11 +19,11 @@
 # limitations under the License.
 
 # Create required directories
-%W(
+%W[
   #{node['nginx']['conf_dir']}
   #{node['nginx']['conf_dir']}/conf.d
   #{node['nginx']['log_dir']}
-).each do |dir|
+].each do |dir|
   directory dir do
     owner 'root'
     group node['root_group']
@@ -34,10 +34,10 @@ end
 
 # Create sites directories if they don't exist
 if platform_family?('debian')
-  %W(
+  %W[
     #{node['nginx']['sites_available_dir']}
     #{node['nginx']['sites_dir']}
-  ).each do |sites_dir|
+  ].each do |sites_dir|
     directory sites_dir do
       owner 'root'
       group node['root_group']
@@ -57,14 +57,14 @@ end
 # Generate DH parameters for nginx if enabled
 if node['nginx']['ssl']['enabled'] && node['nginx']['ssl']['dhparam'].nil?
   dhparam_file = "#{node['nginx']['conf_dir']}/dhparam.pem"
-  
+
   # Generate Diffie-Hellman parameters
   execute 'generate-dhparam' do
     command "openssl dhparam -out #{dhparam_file} 2048"
     not_if { ::File.exist?(dhparam_file) }
     notifies :reload, 'service[nginx]', :delayed
   end
-  
+
   # Set the dhparam attribute
   node.default['nginx']['ssl']['dhparam'] = dhparam_file
 end
