@@ -11,7 +11,9 @@ group :development do
   gem 'cookstyle'
   gem 'kitchen-dokken'
   gem 'kitchen-inspec'
-  gem 'ruby-shadow' # For user resources
+  install_if -> { RUBY_PLATFORM =~ /linux|freebsd|solaris/ } do
+    gem 'ruby-shadow' # For user resources
+  end
   gem 'test-kitchen'
 end
 
