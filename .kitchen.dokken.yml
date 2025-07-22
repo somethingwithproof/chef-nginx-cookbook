@@ -2,7 +2,7 @@
 driver:
   name: dokken
   privileged: true
-  chef_version: <%= ENV['CHEF_VERSION'] || 'current' %>
+  chef_version: <%= ENV['CHEF_VERSION'] || 'latest' %> # Use latest Chef 19
   memory: <%= ENV['DOCKER_MEMORY'] || '1024m' %>
   cpus: <%= ENV['DOCKER_CPUS'] || 2 %>
 
@@ -12,7 +12,7 @@ transport:
 provisioner:
   name: dokken
   deprecations_as_errors: true
-  chef_license: accept-silent
+  chef_license: accept-no-persist
   enforce_idempotency: true
   multiple_converge: 2
   client_rb:
