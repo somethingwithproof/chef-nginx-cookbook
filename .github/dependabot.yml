@@ -1,20 +1,25 @@
 version: 2
 updates:
-  - package-ecosystem: "bundler"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    reviewers:
-      - "thomasvincent"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
-    reviewers:
-      - "thomasvincent"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # bundler
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    allow:
+      - dependency-type: "all"
