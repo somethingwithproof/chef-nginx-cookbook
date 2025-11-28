@@ -25,6 +25,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Install system dependencies for ruby-shadow
+        run: sudo apt-get update && sudo apt-get install -y libshadow-dev
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -73,6 +75,8 @@ jobs:
       DOCKER_CPUS: "2"
     steps:
       - uses: actions/checkout@v4
+      - name: Install system dependencies for ruby-shadow
+        run: sudo apt-get update && sudo apt-get install -y libshadow-dev
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
