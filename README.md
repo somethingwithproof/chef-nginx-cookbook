@@ -1,10 +1,10 @@
 # NGINX Cookbook
 
 [![Cookbook Version](https://img.shields.io/cookbook/v/nginx.svg)](https://supermarket.chef.io/cookbooks/nginx)
-[![Build Status](https://img.shields.io/github/workflow/status/thomasvincent/chef-nginx-cookbook/ci)](https://github.com/thomasvincent/chef-nginx-cookbook/actions/workflows/ci.yml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/thomasvincent/chef-nginx-cookbook/ci.yml?branch=main)](https://github.com/thomasvincent/chef-nginx-cookbook/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A modern, advanced Chef cookbook to install and configure Nginx with comprehensive functionality.
+A modern, advanced Chef cookbook to install and configure NGINX 1.2x with comprehensive functionality, security headers, and module support.
 
 ## Requirements
 
@@ -33,10 +33,10 @@ A modern, advanced Chef cookbook to install and configure Nginx with comprehensi
 
 ## Features
 
-- Nginx installation from OS packages or source
+- NGINX 1.2x installation from OS packages or source
 - Support for mainline and stable branches
 - Modular configuration with smart default settings
-- TLS/SSL support with modern cipher configurations
+- TLS/SSL support with modern cipher configurations (TLS 1.2/1.3)
 - Virtual site management with template flexibility
 - Advanced logging options
 - Performance tuning based on system resources
@@ -47,6 +47,129 @@ A modern, advanced Chef cookbook to install and configure Nginx with comprehensi
 - Zero Downtime Deployment pattern with graceful reloads
 - Ops Actions pattern for backup/restore and blue-green deployments
 - Telemetry integration with Prometheus and Grafana
+- **Security Headers** (X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, etc.)
+
+## Module Installation Examples
+
+### Enabling Built-in Modules
+
+```ruby
+# Enable common modules via attributes
+node.default['nginx']['modules'] = %w[
+  http_ssl
+  http_v2
+  http_geoip
+  http_stub_status
+  http_realip
+  http_sub
+]
+```
+
+### Using nginx_module Resource
+
+```ruby
+# Enable SSL module
+nginx_module 'ssl' do
+  action :enable
+end
+
+# Enable stub_status with custom configuration
+nginx_module 'status' do
+  configuration <<~EOL
+    location /nginx_status {
+      stub_status on;
+      allow 127.0.0.1;
+      deny all;
+    }
+  EOL
+  action :enable
+end
+
+# Enable GeoIP2 module (requires external package)
+nginx_module 'geoip2' do
+  install_package true
+  action :enable
+end
+```
+
+### Third-Party Module Examples
+
+#### Brotli Compression
+
+```ruby
+# Enable Brotli compression module
+node.default['nginx']['modules'] = ['ngx_brotli']
+node.default['nginx']['brotli']['enabled'] = true
+node.default['nginx']['brotli']['comp_level'] = 6
+
+# Or use the resource
+nginx_module 'brotli' do
+  install_package true
+  configuration <<~EOL
+    brotli on;
+    brotli_comp_level 6;
+    brotli_types text/plain text/css application/json application/javascript;
+  EOL
+  action :enable
+end
+```
+
+#### ModSecurity WAF
+
+```ruby
+# Enable ModSecurity Web Application Firewall
+nginx_module 'modsecurity' do
+  install_package true
+  configuration <<~EOL
+    modsecurity on;
+    modsecurity_rules_file /etc/nginx/modsecurity/main.conf;
+  EOL
+  action :enable
+end
+```
+
+#### Headers More Module
+
+```ruby
+# Enable headers-more-nginx-module for advanced header manipulation
+nginx_module 'headers_more' do
+  install_package true
+  action :enable
+end
+
+# Then use in your site configuration
+nginx_site 'example.com' do
+  custom_directives <<~EOL
+    more_set_headers "Server: MyServer";
+    more_clear_headers "X-Powered-By";
+  EOL
+  action :create
+end
+```
+
+#### Cache Purge Module
+
+```ruby
+# Enable ngx_cache_purge for cache management
+nginx_module 'cache_purge' do
+  install_package true
+  configuration <<~EOL
+    proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m;
+  EOL
+  action :enable
+end
+```
+
+### Dynamic Module Loading (NGINX 1.2x)
+
+```ruby
+# Load dynamic modules
+node.default['nginx']['dynamic_modules'] = [
+  'ngx_http_geoip2_module',
+  'ngx_http_image_filter_module',
+  'ngx_http_perl_module',
+]
+```
 
 ## Custom Resources
 
@@ -56,7 +179,7 @@ Install Nginx web server.
 
 ```ruby
 nginx_install 'default' do
-  version '1.24.0'
+  version '1.26.0'
   install_method 'package'
   action :install
 end
@@ -164,6 +287,28 @@ Properties:
 - `restart_command` - Command to restart the service
 - `reload_command` - Command to reload the service
 - `supports` - Service supports hash
+
+## Security Headers
+
+This cookbook automatically configures the following security headers in `nginx.conf`:
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| X-Frame-Options | SAMEORIGIN | Prevents clickjacking attacks |
+| X-Content-Type-Options | nosniff | Prevents MIME type sniffing |
+| X-XSS-Protection | 1; mode=block | Enables XSS filter in browsers |
+| Referrer-Policy | strict-origin-when-cross-origin | Controls referrer information |
+| Permissions-Policy | geolocation=(), microphone=(), camera=() | Restricts browser features |
+
+### Customizing Security Headers
+
+```ruby
+node.default['nginx']['security']['headers'] = {
+  'X-Frame-Options' => 'DENY',
+  'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'",
+  'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains',
+}
+```
 
 ## Attributes
 
