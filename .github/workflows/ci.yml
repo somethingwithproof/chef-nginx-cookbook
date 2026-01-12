@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install system dependencies for ruby-shadow
         run: sudo apt-get update && sudo apt-get install -y libpam0g-dev
       - name: Set up Ruby
@@ -40,13 +40,13 @@ jobs:
         run: bundle exec rspec --format documentation --format RspecJunitFormatter --out rspec.xml
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: rspec-results
           path: rspec.xml
       - name: Upload coverage results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-results
           path: coverage/
@@ -74,7 +74,7 @@ jobs:
       DOCKER_MEMORY: "2048m"
       DOCKER_CPUS: "2"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install system dependencies for ruby-shadow
         run: sudo apt-get update && sudo apt-get install -y libpam0g-dev
       - name: Set up Ruby
@@ -95,7 +95,7 @@ jobs:
           bundle exec kitchen test ${{ matrix.suite }}-${{ matrix.os }} --destroy=always
       - name: Upload kitchen logs on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: kitchen-logs-${{ matrix.suite }}-${{ matrix.os }}
           path: .kitchen/logs/
@@ -105,7 +105,7 @@ jobs:
     timeout-minutes: 15
     needs: lint
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run security scan
         uses: ruby/setup-ruby@v1
         with:
