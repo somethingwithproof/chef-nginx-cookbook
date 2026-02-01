@@ -1,26 +1,29 @@
 server {
+    <% if defined?(@ssl_enabled) && @ssl_enabled %>
+    listen <%= @port %> ssl http2;
+    <% else %>
     listen <%= @port %>;
+    <% end %>
     server_name <%= @server_name %>;
-    
+
     root <%= @root %>;
-    
+
     access_log <%= @access_log %>;
     error_log <%= @error_log %>;
-    
+
     # Main location
     location / {
         try_files $uri $uri/ =404;
         index index.html index.htm;
     }
-    
+
     <% if @custom_directives %>
     # Custom directives
     <%= @custom_directives %>
     <% end %>
-    
+
     <% if defined?(@ssl_enabled) && @ssl_enabled %>
-    # SSL configuration
-    ssl on;
+    # SSL configuration (ssl on; is deprecated in Nginx 1.25+)
     ssl_certificate <%= @ssl_cert %>;
     ssl_certificate_key <%= @ssl_key %>;
     ssl_protocols <%= @ssl_protocols %>;

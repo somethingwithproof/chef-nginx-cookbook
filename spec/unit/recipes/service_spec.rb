@@ -9,7 +9,7 @@ describe 'nginx::service' do
     let(:chef_run) do
       runner = ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '22.04') do |node|
         node.normal['nginx']['service_name'] = 'nginx'
-        node.normal['nginx']['service_actions'] = %w[enable start]
+        node.normal['nginx']['service_actions'] = %w(enable start)
       end
       runner.converge(described_recipe)
     end
@@ -29,7 +29,7 @@ describe 'nginx::service' do
     let(:chef_run) do
       runner = ChefSpec::SoloRunner.new(platform: 'centos', version: '8') do |node|
         node.normal['nginx']['service_name'] = 'nginx'
-        node.normal['nginx']['service_actions'] = %w[enable start]
+        node.normal['nginx']['service_actions'] = %w(enable start)
       end
       runner.converge(described_recipe)
     end

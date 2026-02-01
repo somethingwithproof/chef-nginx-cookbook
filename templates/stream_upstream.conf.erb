@@ -1,0 +1,21 @@
+# Stream Upstream: <%= @name %>
+# Managed by Chef - DO NOT EDIT MANUALLY
+
+upstream <%= @name %> {
+<% case @method
+   when 'least_conn' -%>
+    least_conn;
+<% when 'hash' -%>
+    hash <%= @hash_key %> consistent;
+<% when 'random' -%>
+    random;
+<% end -%>
+
+<% if @zone -%>
+    zone <%= @zone %> <%= @zone_size %>;
+<% end -%>
+
+<% @servers.each do |server| -%>
+    server <%= server['address'] %><% if server['weight'] && server['weight'] != 1 %> weight=<%= server['weight'] %><% end %><% if server['max_fails'] %> max_fails=<%= server['max_fails'] %><% end %><% if server['fail_timeout'] %> fail_timeout=<%= server['fail_timeout'] %><% end %><% if server['max_conns'] %> max_conns=<%= server['max_conns'] %><% end %><% if server['backup'] %> backup<% end %><% if server['down'] %> down<% end %>;
+<% end -%>
+}
