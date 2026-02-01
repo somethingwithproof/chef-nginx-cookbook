@@ -59,8 +59,8 @@ jobs:
       matrix:
         os:
           [
-            ubuntu-22.04,
-            ubuntu-24.04,
+            ubuntu-2204,
+            ubuntu-2404,
             debian-12,
             rockylinux-9,
             almalinux-9,
@@ -70,7 +70,6 @@ jobs:
       fail-fast: false
     env:
       CHEF_LICENSE: accept-no-persist
-      KITCHEN_LOCAL_YAML: .kitchen.dokken.yml
       DOCKER_MEMORY: "2048m"
       DOCKER_CPUS: "2"
     steps:
@@ -93,6 +92,8 @@ jobs:
       - name: Test Kitchen
         run: |
           bundle exec kitchen test ${{ matrix.suite }}-${{ matrix.os }} --destroy=always
+        env:
+          KITCHEN_YAML: kitchen.yml
       - name: Upload kitchen logs on failure
         if: failure()
         uses: actions/upload-artifact@v6
