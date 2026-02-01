@@ -14,5 +14,6 @@ group :test do
   gem 'kitchen-dokken', '~> 2.20'
   gem 'test-kitchen', '~> 3.7'
   gem 'simplecov', '~> 0.22'
+  gem 'rspec_junit_formatter'
   gem 'simplecov-console', '~> 0.9'
 end
