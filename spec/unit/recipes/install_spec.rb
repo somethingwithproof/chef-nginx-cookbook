@@ -59,7 +59,7 @@ describe 'nginx::install' do
         node.normal['nginx']['install_method'] = 'source'
         node.normal['nginx']['version'] = '1.24.0'
         node.normal['nginx']['source']['url'] = 'https://nginx.org/download/nginx-1.24.0.tar.gz'
-        node.normal['nginx']['source']['dependencies'] = %w[libpcre3-dev zlib1g-dev libssl-dev]
+        node.normal['nginx']['source']['dependencies'] = %w(libpcre3-dev zlib1g-dev libssl-dev)
         node.normal['nginx']['source']['configure_options'] = ['--with-http_ssl_module']
         node.normal['nginx']['source']['prefix'] = '/usr/local/nginx'
         node.normal['nginx']['user'] = 'nginx'

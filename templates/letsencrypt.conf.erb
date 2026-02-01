@@ -1,0 +1,21 @@
+# Let's Encrypt ACME Challenge Configuration
+# Managed by Chef - DO NOT EDIT MANUALLY
+
+# ACME challenge location - must be accessible without SSL
+location ^~ /.well-known/acme-challenge/ {
+    root <%= @webroot %>;
+    default_type "text/plain";
+    try_files $uri =404;
+
+    # Allow all access to ACME challenges
+    allow all;
+
+    # Disable caching for challenge files
+    add_header Cache-Control "no-store, no-cache, must-revalidate, max-age=0";
+    add_header Pragma "no-cache";
+}
+
+# Hide dotfiles except .well-known
+location ~ /\.(?!well-known) {
+    deny all;
+}

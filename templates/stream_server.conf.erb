@@ -1,0 +1,29 @@
+# Stream Server: <%= @name %>
+# Managed by Chef - DO NOT EDIT MANUALLY
+
+server {
+    listen <%= @listen_port %><% if @protocol == 'udp' %> udp<% end %><% if @ssl %> ssl<% end %>;
+<% if @protocol == 'udp' -%>
+    proxy_responses 1;
+<% end -%>
+
+<% if @ssl -%>
+    # SSL Configuration
+    ssl_certificate <%= @ssl_certificate %>;
+    ssl_certificate_key <%= @ssl_certificate_key %>;
+    ssl_protocols <%= @ssl_protocols %>;
+<% if @ssl_ciphers -%>
+    ssl_ciphers <%= @ssl_ciphers %>;
+<% end -%>
+    ssl_session_cache shared:SSL_STREAM:10m;
+    ssl_session_timeout 1d;
+<% end -%>
+
+    # Proxy Configuration
+    proxy_pass <%= @upstream %>;
+    proxy_timeout <%= @proxy_timeout %>;
+    proxy_connect_timeout <%= @proxy_connect_timeout %>;
+<% if @proxy_protocol -%>
+    proxy_protocol on;
+<% end -%>
+}

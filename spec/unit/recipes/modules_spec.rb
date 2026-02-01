@@ -8,7 +8,7 @@ describe 'nginx::default' do
 
     let(:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '22.04') do |node|
-        node.normal['nginx']['modules'] = %w[http_ssl http_v2 http_geoip http_stub_status]
+        node.normal['nginx']['modules'] = %w(http_ssl http_v2 http_geoip http_stub_status)
       end.converge(described_recipe)
     end
 

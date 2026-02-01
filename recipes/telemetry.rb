@@ -28,9 +28,13 @@ if node['nginx']['telemetry']['prometheus']['enabled']
   node.default['nginx']['monitoring']['restricted_access'] = true
   node.default['nginx']['monitoring']['allowed_ips'] = node['nginx']['telemetry']['prometheus']['allow_ips']
 
-  # Install nginx-prometheus-exporter
-  remote_file "#{Chef::Config[:file_cache_path]}/nginx-prometheus-exporter" do
-    source 'https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz'
+  # Install nginx-prometheus-exporter (current stable version configurable via attributes)
+  nginx_exporter_version = node['nginx']['telemetry']['prometheus']['exporter_version']
+  nginx_exporter_checksum = node['nginx']['telemetry']['prometheus']['exporter_checksum']
+
+  remote_file "#{Chef::Config[:file_cache_path]}/nginx-prometheus-exporter.tar.gz" do
+    source "https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v#{nginx_exporter_version}/nginx-prometheus-exporter_#{nginx_exporter_version}_linux_amd64.tar.gz"
+    checksum nginx_exporter_checksum if nginx_exporter_checksum
     action :create
     notifies :run, 'bash[extract_nginx_prometheus_exporter]', :immediately
   end
@@ -38,8 +42,9 @@ if node['nginx']['telemetry']['prometheus']['enabled']
   bash 'extract_nginx_prometheus_exporter' do
     cwd Chef::Config[:file_cache_path]
     code <<-EOH
-      tar xzf nginx-prometheus-exporter
-      cp nginx-prometheus-exporter_*/nginx-prometheus-exporter /usr/local/bin/
+      set -e
+      tar xzf nginx-prometheus-exporter.tar.gz
+      cp nginx-prometheus-exporter /usr/local/bin/
       chmod +x /usr/local/bin/nginx-prometheus-exporter
     EOH
     action :nothing
@@ -65,7 +70,7 @@ if node['nginx']['telemetry']['prometheus']['enabled']
 
   # Enable and start service
   service 'nginx-prometheus-exporter' do
-    action %i[enable start]
+    action %i(enable start)
   end
 end
 
@@ -78,7 +83,7 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
     'dashboard' => {
       'id' => nil,
       'title' => 'Nginx Metrics',
-      'tags' => %w[nginx prometheus web],
+      'tags' => %w(nginx prometheus web),
       'timezone' => 'browser',
       'schemaVersion' => 16,
       'version' => 1,
@@ -93,24 +98,24 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
             {
               'expr' => 'nginx_connections_active',
               'refId' => 'A',
-              'legendFormat' => 'Active Connections'
+              'legendFormat' => 'Active Connections',
             },
             {
               'expr' => 'nginx_connections_reading',
               'refId' => 'B',
-              'legendFormat' => 'Reading'
+              'legendFormat' => 'Reading',
             },
             {
               'expr' => 'nginx_connections_writing',
               'refId' => 'C',
-              'legendFormat' => 'Writing'
+              'legendFormat' => 'Writing',
             },
             {
               'expr' => 'nginx_connections_waiting',
               'refId' => 'D',
-              'legendFormat' => 'Waiting'
-            }
-          ]
+              'legendFormat' => 'Waiting',
+            },
+          ],
         },
         {
           'type' => 'graph',
@@ -121,26 +126,26 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
             {
               'expr' => 'rate(nginx_http_requests_total[5m])',
               'refId' => 'A',
-              'legendFormat' => 'Requests/s'
-            }
-          ]
-        }
+              'legendFormat' => 'Requests/s',
+            },
+          ],
+        },
       ],
       'templating' => {
-        'list' => []
+        'list' => [],
       },
       'time' => {
         'from' => 'now-6h',
-        'to' => 'now'
+        'to' => 'now',
       },
       'timepicker' => {
-        'refresh_intervals' => %w[5s 10s 30s 1m 5m 15m 30m 1h 2h 1d]
-      }
+        'refresh_intervals' => %w(5s 10s 30s 1m 5m 15m 30m 1h 2h 1d),
+      },
     },
     'folderId' => 0,
     'folderUid' => '',
     'message' => 'Nginx dashboard created by Chef',
-    'overwrite' => true
+    'overwrite' => true,
   }
 
   # Write dashboard JSON to file
@@ -154,8 +159,9 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
 
   # Upload to Grafana if API key provided
   if node['nginx']['telemetry']['grafana']['api_key']
-    # Required gems for HTTP requests
+    # Required gems for HTTP requests (pin version for reproducible builds)
     chef_gem 'httparty' do
+      version '~> 0.21.0'
       compile_time true
     end
 
@@ -167,7 +173,7 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
         url = "#{node['nginx']['telemetry']['grafana']['url']}/api/dashboards/db"
         headers = {
           'Content-Type' => 'application/json',
-          'Authorization' => "Bearer #{node['nginx']['telemetry']['grafana']['api_key']}"
+          'Authorization' => "Bearer #{node['nginx']['telemetry']['grafana']['api_key']}",
         }
 
         # Send request
@@ -177,12 +183,12 @@ if node['nginx']['telemetry']['grafana']['enabled'] && node['nginx']['telemetry'
                                    headers: headers)
 
           if response.code == 200
-            Chef::Log.info('Grafana dashboard created successfully')
+            Chef.logger.info('Grafana dashboard created successfully')
           else
-            Chef::Log.error("Failed to create Grafana dashboard: #{response.body}")
+            Chef.logger.error("Failed to create Grafana dashboard: #{response.body}")
           end
         rescue StandardError => e
-          Chef::Log.error("Error communicating with Grafana API: #{e.message}")
+          Chef.logger.error("Error communicating with Grafana API: #{e.message}")
         end
       end
       action :run

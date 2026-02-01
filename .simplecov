@@ -7,8 +7,7 @@ SimpleCov.start do
   add_group 'Resources', 'resources'
   add_group 'Recipes', 'recipes'
   minimum_coverage 80
-  
+
   # Use HTML formatter for better readability
   formatter SimpleCov::Formatter::HTMLFormatter
 end
-
