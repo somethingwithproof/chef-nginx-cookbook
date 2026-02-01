@@ -8,6 +8,7 @@ bin/*
 .kitchen/
 .kitchen.local.yml
 .coverage/
+coverage/
 Berksfile.lock
 Gemfile.lock
 

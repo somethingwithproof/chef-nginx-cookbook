@@ -19,11 +19,11 @@
 # limitations under the License.
 
 # Create required directories
-%W[
+%W(
   #{node['nginx']['conf_dir']}
   #{node['nginx']['conf_dir']}/conf.d
   #{node['nginx']['log_dir']}
-].each do |dir|
+).each do |dir|
   directory dir do
     owner 'root'
     group node['root_group']
@@ -34,10 +34,10 @@ end
 
 # Create sites directories if they don't exist
 if platform_family?('debian')
-  %W[
+  %W(
     #{node['nginx']['sites_available_dir']}
     #{node['nginx']['sites_dir']}
-  ].each do |sites_dir|
+  ).each do |sites_dir|
     directory sites_dir do
       owner 'root'
       group node['root_group']

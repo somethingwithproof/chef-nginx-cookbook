@@ -2,34 +2,17 @@
 
 source 'https://rubygems.org'
 
-gem 'berkshelf', '>= 8.0'
-gem 'chef', '>= 18.0'
+gem 'chef', '~> 18.0'
+gem 'chefspec', '>= 9.3.8'
+gem 'cookstyle', '~> 8.1'
 
 group :development do
-  gem 'chef-cli'
-  gem 'chefspec'
-  gem 'cookstyle'
-  gem 'kitchen-dokken'
-  gem 'kitchen-inspec'
-  install_if -> { RUBY_PLATFORM =~ /linux|freebsd|solaris/ } do
-    gem 'ruby-shadow' # For user resources
-  end
-  gem 'test-kitchen'
+  gem 'rake', '~> 13.0'
 end
 
 group :test do
-  gem 'concurrent-ruby'
-  gem 'github-markup'
-  gem 'inspec'
-  gem 'inspec-bin'
-  gem 'kitchen-vagrant'
-  gem 'rspec'
-  gem 'rspec_junit_formatter'
-  gem 'simplecov'
-  gem 'simplecov-console'
-end
-
-group :docs do
-  gem 'redcarpet'
-  gem 'yard'
+  gem 'kitchen-dokken', '~> 2.20'
+  gem 'test-kitchen', '~> 3.7'
+  gem 'simplecov', '~> 0.22'
+  gem 'simplecov-console', '~> 0.9'
 end

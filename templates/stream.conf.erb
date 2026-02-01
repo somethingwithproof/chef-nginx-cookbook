@@ -1,0 +1,16 @@
+# Stream (TCP/UDP) Proxy Configuration
+# Managed by Chef - DO NOT EDIT MANUALLY
+
+stream {
+    # Log format for stream connections
+    log_format stream_basic '$remote_addr [$time_local] '
+                           '$protocol $status $bytes_sent $bytes_received '
+                           '$session_time "$upstream_addr" '
+                           '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+
+    # Enable access logging for stream connections
+    access_log /var/log/nginx/stream_access.log stream_basic;
+
+    # Include stream configuration files
+    include <%= @stream_dir %>/*.conf;
+}

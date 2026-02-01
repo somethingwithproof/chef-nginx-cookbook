@@ -21,5 +21,5 @@
 service 'nginx' do
   service_name node['nginx']['service_name']
   supports status: true, restart: true, reload: true
-  action %i[enable start]
+  action %i(enable start)
 end

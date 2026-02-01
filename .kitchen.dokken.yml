@@ -2,7 +2,7 @@
 driver:
   name: dokken
   privileged: true
-  chef_version: <%= ENV['CHEF_VERSION'] || 'latest' %> # Use latest Chef 19
+  chef_version: <%= ENV['CHEF_VERSION'] || 'latest' %>
   memory: <%= ENV['DOCKER_MEMORY'] || '1024m' %>
   cpus: <%= ENV['DOCKER_CPUS'] || 2 %>
 
@@ -15,22 +15,12 @@ provisioner:
   chef_license: accept-no-persist
   enforce_idempotency: true
   multiple_converge: 2
-  client_rb:
-    data_collector.mode: :solo
-    compliance.profiles.upload: true
 
 verifier:
   name: inspec
 
+# Modern platforms only (2026 non-EOL)
 platforms:
-  - name: ubuntu-20.04
-    driver:
-      image: dokken/ubuntu-20.04
-      pid_one_command: /bin/systemd
-      intermediate_instructions:
-        - RUN /usr/bin/apt-get update -qq
-        - RUN /usr/bin/apt-get install -y curl
-
   - name: ubuntu-22.04
     driver:
       image: dokken/ubuntu-22.04
@@ -47,14 +37,6 @@ platforms:
         - RUN /usr/bin/apt-get update -qq
         - RUN /usr/bin/apt-get install -y curl
 
-  - name: debian-11
-    driver:
-      image: dokken/debian-11
-      pid_one_command: /bin/systemd
-      intermediate_instructions:
-        - RUN /usr/bin/apt-get update -qq
-        - RUN /usr/bin/apt-get install -y curl
-
   - name: debian-12
     driver:
       image: dokken/debian-12
@@ -63,58 +45,31 @@ platforms:
         - RUN /usr/bin/apt-get update -qq
         - RUN /usr/bin/apt-get install -y curl
 
-  - name: centos-stream-8
-    driver:
-      image: dokken/centos-stream-8
-      pid_one_command: /usr/lib/systemd/systemd
-      intermediate_instructions:
-        - RUN yum -y install sudo curl
-
-  - name: centos-stream-9
-    driver:
-      image: dokken/centos-stream-9
-      pid_one_command: /usr/lib/systemd/systemd
-      intermediate_instructions:
-        - RUN yum -y install sudo curl
-
-  - name: rockylinux-8
-    driver:
-      image: dokken/rockylinux-8
-      pid_one_command: /usr/lib/systemd/systemd
-      intermediate_instructions:
-        - RUN yum -y install sudo curl
-
   - name: rockylinux-9
     driver:
       image: dokken/rockylinux-9
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
-        - RUN yum -y install sudo curl
-
-  - name: almalinux-8
-    driver:
-      image: dokken/almalinux-8
-      pid_one_command: /usr/lib/systemd/systemd
-      intermediate_instructions:
-        - RUN yum -y install sudo curl
+        - RUN dnf -y install sudo curl
 
   - name: almalinux-9
     driver:
       image: dokken/almalinux-9
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
-        - RUN yum -y install sudo curl
-
-  - name: amazonlinux-2
-    driver:
-      image: dokken/amazonlinux-2
-      pid_one_command: /usr/lib/systemd/systemd
-      intermediate_instructions:
-        - RUN yum -y install sudo curl
+        - RUN dnf -y install sudo curl
 
   - name: amazonlinux-2023
     driver:
       image: dokken/amazonlinux-2023
       pid_one_command: /usr/lib/systemd/systemd
       intermediate_instructions:
-        - RUN yum -y install sudo curl
+        - RUN dnf -y install sudo curl
+
+suites:
+  - name: default
+    run_list:
+      - recipe[nginx::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default

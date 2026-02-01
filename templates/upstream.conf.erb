@@ -1,0 +1,43 @@
+# Upstream: <%= @name %>
+# Managed by Chef - DO NOT EDIT MANUALLY
+
+upstream <%= @name %> {
+<% case @method
+   when 'least_conn' -%>
+    least_conn;
+<% when 'ip_hash' -%>
+    ip_hash;
+<% when 'random' -%>
+    random;
+<% when 'hash' -%>
+    hash <%= @hash_key %> consistent;
+<% end -%>
+
+<% if @zone -%>
+    zone <%= @zone %> <%= @zone_size %>;
+<% end -%>
+
+<% @servers.each do |server| -%>
+    server <%= server['address'] %><% if server['weight'] && server['weight'] != 1 %> weight=<%= server['weight'] %><% end %><% if server['max_fails'] %> max_fails=<%= server['max_fails'] %><% end %><% if server['fail_timeout'] %> fail_timeout=<%= server['fail_timeout'] %><% end %><% if server['max_conns'] %> max_conns=<%= server['max_conns'] %><% end %><% if server['slow_start'] %> slow_start=<%= server['slow_start'] %><% end %><% if server['backup'] %> backup<% end %><% if server['down'] %> down<% end %>;
+<% end -%>
+
+<% if @keepalive && @keepalive > 0 -%>
+    keepalive <%= @keepalive %>;
+<% if @keepalive_requests -%>
+    keepalive_requests <%= @keepalive_requests %>;
+<% end -%>
+<% if @keepalive_timeout -%>
+    keepalive_timeout <%= @keepalive_timeout %>;
+<% end -%>
+<% end -%>
+
+<% if @sticky && !@sticky.empty? -%>
+<% if @sticky['cookie'] -%>
+    sticky cookie <%= @sticky['cookie'] %><% if @sticky['expires'] %> expires=<%= @sticky['expires'] %><% end %><% if @sticky['path'] %> path=<%= @sticky['path'] %><% end %>;
+<% elsif @sticky['route'] -%>
+    sticky route <%= @sticky['route'] %>;
+<% elsif @sticky['learn'] -%>
+    sticky learn create=<%= @sticky['create'] %> lookup=<%= @sticky['lookup'] %> zone=<%= @sticky['zone'] %>;
+<% end -%>
+<% end -%>
+}

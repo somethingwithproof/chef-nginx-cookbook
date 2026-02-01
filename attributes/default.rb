@@ -48,13 +48,39 @@ when 'debian'
   default['nginx']['log_dir'] = '/var/log/nginx'
   default['nginx']['error_log'] = '/var/log/nginx/error.log'
   default['nginx']['access_log'] = '/var/log/nginx/access.log'
+when 'freebsd'
+  default['nginx']['package_name'] = 'nginx'
+  default['nginx']['service_name'] = 'nginx'
+  default['nginx']['conf_dir'] = '/usr/local/etc/nginx'
+  default['nginx']['sites_dir'] = '/usr/local/etc/nginx/sites-enabled'
+  default['nginx']['sites_available_dir'] = '/usr/local/etc/nginx/sites-available'
+  default['nginx']['user'] = 'www'
+  default['nginx']['group'] = 'www'
+  default['nginx']['binary'] = '/usr/local/sbin/nginx'
+  default['nginx']['pid_file'] = '/var/run/nginx.pid'
+  default['nginx']['log_dir'] = '/var/log/nginx'
+  default['nginx']['error_log'] = '/var/log/nginx/error.log'
+  default['nginx']['access_log'] = '/var/log/nginx/access.log'
+when 'mac_os_x'
+  default['nginx']['package_name'] = 'nginx'
+  default['nginx']['service_name'] = 'nginx'
+  default['nginx']['conf_dir'] = '/opt/homebrew/etc/nginx'
+  default['nginx']['sites_dir'] = '/opt/homebrew/etc/nginx/servers'
+  default['nginx']['sites_available_dir'] = '/opt/homebrew/etc/nginx/servers'
+  default['nginx']['user'] = '_www'
+  default['nginx']['group'] = '_www'
+  default['nginx']['binary'] = '/opt/homebrew/bin/nginx'
+  default['nginx']['pid_file'] = '/opt/homebrew/var/run/nginx.pid'
+  default['nginx']['log_dir'] = '/opt/homebrew/var/log/nginx'
+  default['nginx']['error_log'] = '/opt/homebrew/var/log/nginx/error.log'
+  default['nginx']['access_log'] = '/opt/homebrew/var/log/nginx/access.log'
 end
 
 # Source installation attributes
 default['nginx']['source']['url'] = "https://nginx.org/download/nginx-#{node['nginx']['version']}.tar.gz"
 default['nginx']['source']['checksum'] = nil # Auto-generated
 default['nginx']['source']['prefix'] = '/usr/local/nginx'
-default['nginx']['source']['configure_options'] = %w[
+default['nginx']['source']['configure_options'] = %w(
   --with-http_ssl_module
   --with-http_v2_module
   --with-http_realip_module
@@ -72,10 +98,10 @@ default['nginx']['source']['configure_options'] = %w[
   --with-mail_ssl_module
   --with-file-aio
   --with-threads
-]
+)
 default['nginx']['source']['dependencies'] = case node['platform_family']
                                              when 'rhel', 'fedora', 'amazon'
-                                               %w[
+                                               %w(
                                                  openssl-devel
                                                  pcre-devel
                                                  zlib-devel
@@ -85,9 +111,9 @@ default['nginx']['source']['dependencies'] = case node['platform_family']
                                                  perl-devel
                                                  perl-ExtUtils-Embed
                                                  gperftools-devel
-                                               ]
+                                               )
                                              when 'debian'
-                                               %w[
+                                               %w(
                                                  libssl-dev
                                                  libpcre3-dev
                                                  zlib1g-dev
@@ -97,7 +123,24 @@ default['nginx']['source']['dependencies'] = case node['platform_family']
                                                  libperl-dev
                                                  libgeoip-dev
                                                  libgoogle-perftools-dev
-                                               ]
+                                               )
+                                             when 'freebsd'
+                                               %w(
+                                                 pcre
+                                                 libxml2
+                                                 libxslt
+                                                 libgd
+                                                 perl5
+                                               )
+                                             when 'mac_os_x'
+                                               %w(
+                                                 pcre
+                                                 openssl
+                                                 libxml2
+                                                 libxslt
+                                               )
+                                             else
+                                               []
                                              end
 
 # Performance tuning
@@ -129,7 +172,7 @@ default['nginx']['config']['server_names_hash_max_size'] = 512
 default['nginx']['config']['server_tokens'] = 'off'
 default['nginx']['config']['log_format'] = {
   'main' => '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for"',
-  'json' => '{"time":"$time_local","remote_addr":"$remote_addr","remote_user":"$remote_user","request":"$request","status":$status,"body_bytes_sent":$body_bytes_sent,"request_time":$request_time,"http_referrer":"$http_referer","http_user_agent":"$http_user_agent","http_x_forwarded_for":"$http_x_forwarded_for"}'
+  'json' => '{"time":"$time_local","remote_addr":"$remote_addr","remote_user":"$remote_user","request":"$request","status":$status,"body_bytes_sent":$body_bytes_sent,"request_time":$request_time,"http_referrer":"$http_referer","http_user_agent":"$http_user_agent","http_x_forwarded_for":"$http_x_forwarded_for"}',
 }
 default['nginx']['config']['access_log'] = 'on'
 default['nginx']['config']['error_log'] = 'warn'
@@ -143,12 +186,12 @@ default['nginx']['security']['add_headers'] = {
   'X-Frame-Options' => 'SAMEORIGIN',
   'X-Content-Type-Options' => 'nosniff',
   'X-XSS-Protection' => '1; mode=block',
-  'Referrer-Policy' => 'strict-origin-when-cross-origin'
+  'Referrer-Policy' => 'strict-origin-when-cross-origin',
 }
-default['nginx']['security']['hide_headers'] = %w[
+default['nginx']['security']['hide_headers'] = %w(
   Server
   X-Powered-By
-]
+)
 
 # SSL/TLS Configuration
 default['nginx']['ssl']['enabled'] = true
@@ -172,15 +215,15 @@ default['nginx']['ssl']['hsts_preload'] = false
 default['nginx']['ssl']['redirect_http_to_https'] = true
 
 # Default modules to enable
-default['nginx']['modules'] = %w[
+default['nginx']['modules'] = %w(
   http_ssl
   http_v2
   http_gzip_static
   http_stub_status
-]
+)
 
 # Default modules to disable
-default['nginx']['disabled_modules'] = %w[]
+default['nginx']['disabled_modules'] = %w()
 
 # Default site
 default['nginx']['default_site'] = {
@@ -189,7 +232,7 @@ default['nginx']['default_site'] = {
   'server_name' => node['fqdn'] || 'localhost',
   'error_log' => 'logs/error.log',
   'access_log' => 'logs/access.log combined',
-  'enabled' => true
+  'enabled' => true,
 }
 
 # Define sites to create (empty by default)
@@ -207,23 +250,31 @@ when 'debian'
   # AppArmor configurations
   default['nginx']['apparmor']['enabled'] = true
   default['nginx']['apparmor']['profile'] = '/etc/apparmor.d/usr.sbin.nginx'
+when 'freebsd'
+  # FreeBSD-specific settings
+  default['nginx']['rc_conf']['nginx_enable'] = 'YES'
+  default['nginx']['logrotate']['postrotate'] = '/usr/sbin/service nginx reload > /dev/null 2>&1 || true'
+when 'mac_os_x'
+  # macOS-specific settings (using Homebrew services)
+  default['nginx']['logrotate']['enabled'] = false # macOS uses newsyslog
+  default['nginx']['use_homebrew_service'] = true
 end
 
 # Firewall configuration
 default['nginx']['firewall']['enabled'] = true
 default['nginx']['firewall']['allow_ports'] = [80, 443]
-default['nginx']['firewall']['source_addresses'] = %w[0.0.0.0/0 ::/0]
+default['nginx']['firewall']['source_addresses'] = %w(0.0.0.0/0 ::/0)
 
 # Monitoring configuration
 default['nginx']['monitoring']['status_path'] = '/nginx_status'
 default['nginx']['monitoring']['restricted_access'] = true
-default['nginx']['monitoring']['allowed_ips'] = %w[127.0.0.1 ::1]
+default['nginx']['monitoring']['allowed_ips'] = %w(127.0.0.1 ::1)
 
 # Logging
 default['nginx']['logrotate']['enabled'] = true
 default['nginx']['logrotate']['rotate'] = 52
 default['nginx']['logrotate']['frequency'] = 'weekly'
-default['nginx']['logrotate']['options'] = %w[missingok compress delaycompress notifempty create]
+default['nginx']['logrotate']['options'] = %w(missingok compress delaycompress notifempty create)
 default['nginx']['logrotate']['postrotate'] = '/bin/systemctl reload nginx.service > /dev/null 2>&1 || true'
 
 # Health check
@@ -236,15 +287,83 @@ default['nginx']['telemetry']['enabled'] = false
 default['nginx']['telemetry']['prometheus']['enabled'] = true
 default['nginx']['telemetry']['prometheus']['scrape_uri'] = '/nginx_status'
 default['nginx']['telemetry']['prometheus']['telemetry_path'] = '/metrics'
-default['nginx']['telemetry']['prometheus']['metrics'] = %w[
+default['nginx']['telemetry']['prometheus']['metrics'] = %w(
   connections
   requests
   http
   ssl
   upstreams
-]
-default['nginx']['telemetry']['prometheus']['allow_ips'] = %w[127.0.0.1 ::1]
+)
+default['nginx']['telemetry']['prometheus']['allow_ips'] = %w(127.0.0.1 ::1)
+default['nginx']['telemetry']['prometheus']['exporter_version'] = '1.3.0'
+default['nginx']['telemetry']['prometheus']['exporter_checksum'] = nil # Set to verify download integrity
 default['nginx']['telemetry']['grafana']['enabled'] = false
 default['nginx']['telemetry']['grafana']['url'] = 'http://localhost:3000'
 default['nginx']['telemetry']['grafana']['datasource'] = 'Prometheus'
 default['nginx']['telemetry']['grafana']['api_key'] = nil
+
+# =============================================================================
+# Let's Encrypt / ACME Configuration
+# =============================================================================
+
+default['nginx']['letsencrypt']['enabled'] = false
+default['nginx']['letsencrypt']['email'] = nil # Required for Let's Encrypt
+default['nginx']['letsencrypt']['webroot'] = '/var/www/letsencrypt'
+default['nginx']['letsencrypt']['staging'] = false # Use staging for testing
+default['nginx']['letsencrypt']['key_size'] = 4096
+default['nginx']['letsencrypt']['renew_before_days'] = 30
+default['nginx']['letsencrypt']['domains'] = [] # Array of domain configs
+
+# =============================================================================
+# Upstream / Load Balancing Configuration
+# =============================================================================
+
+default['nginx']['upstreams'] = {} # Hash of upstream configurations
+
+# Default upstream settings
+default['nginx']['upstream_defaults'] = {
+  'method' => 'round_robin', # round_robin, least_conn, ip_hash, random
+  'keepalive' => 32,
+  'keepalive_requests' => 1000,
+  'keepalive_timeout' => '60s',
+  'fail_timeout' => '10s',
+  'max_fails' => 3,
+}
+
+# =============================================================================
+# Stream (TCP/UDP) Proxy Configuration
+# =============================================================================
+
+default['nginx']['stream']['enabled'] = false
+default['nginx']['stream']['upstreams'] = {}
+default['nginx']['stream']['servers'] = []
+
+# =============================================================================
+# Rate Limiting Configuration
+# =============================================================================
+
+default['nginx']['rate_limit']['enabled'] = true
+default['nginx']['rate_limit']['zones'] = {
+  'default' => {
+    'key' => '$binary_remote_addr',
+    'size' => '10m',
+    'rate' => '10r/s',
+  },
+  'api' => {
+    'key' => '$binary_remote_addr',
+    'size' => '10m',
+    'rate' => '100r/s',
+  },
+}
+
+# =============================================================================
+# Caching Configuration
+# =============================================================================
+
+default['nginx']['cache']['enabled'] = false
+default['nginx']['cache']['path'] = '/var/cache/nginx'
+default['nginx']['cache']['levels'] = '1:2'
+default['nginx']['cache']['keys_zone'] = 'default_cache:10m'
+default['nginx']['cache']['max_size'] = '1g'
+default['nginx']['cache']['inactive'] = '60m'
+default['nginx']['cache']['use_temp_path'] = false

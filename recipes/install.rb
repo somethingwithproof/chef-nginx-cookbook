@@ -18,6 +18,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Declare service resource for notifications from this recipe
+service 'nginx' do
+  action :nothing
+end
+
 case node['platform_family']
 when 'debian'
   apt_repository 'nginx' do
@@ -27,6 +32,7 @@ when 'debian'
     action :add
     only_if { node['nginx']['install_method'] == 'package' }
   end
+
 when 'rhel', 'amazon'
   yum_repository 'nginx' do
     description 'Nginx Repository'
@@ -39,14 +45,47 @@ when 'rhel', 'amazon'
   end
 
   include_recipe 'yum-epel::default' if platform_family?('rhel')
+
+when 'freebsd'
+  # FreeBSD uses pkg for package management
+  # Ensure pkg is bootstrapped
+  execute 'bootstrap_pkg' do
+    command 'pkg bootstrap -y'
+    not_if 'pkg -N'
+  end
+
+when 'mac_os_x'
+  # macOS uses Homebrew for nginx installation
+  unless ::File.exist?('/opt/homebrew/bin/brew') || ::File.exist?('/usr/local/bin/brew')
+    log 'homebrew_required' do
+      message 'Homebrew is required for nginx installation on macOS. Please install: https://brew.sh'
+      level :error
+    end
+  end
 end
 
-# Install nginx package
-package node['nginx']['package_name'] do
-  action :install
-  version node['nginx']['version'] if node['nginx']['version']
-  notifies :reload, 'service[nginx]', :delayed
-  only_if { node['nginx']['install_method'] == 'package' }
+# Install nginx package based on platform
+case node['platform_family']
+when 'debian', 'rhel', 'amazon', 'suse'
+  package node['nginx']['package_name'] do
+    action :install
+    version node['nginx']['version'] if node['nginx']['version']
+    notifies :reload, 'service[nginx]', :delayed
+    only_if { node['nginx']['install_method'] == 'package' }
+  end
+
+when 'freebsd'
+  package 'nginx' do
+    action :install
+    only_if { node['nginx']['install_method'] == 'package' }
+  end
+
+when 'mac_os_x'
+  homebrew_package 'nginx' do
+    action :install
+    only_if { node['nginx']['install_method'] == 'package' }
+    only_if { ::File.exist?('/opt/homebrew/bin/brew') || ::File.exist?('/usr/local/bin/brew') }
+  end
 end
 
 if node['nginx']['install_method'] == 'source'
