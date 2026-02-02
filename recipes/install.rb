@@ -25,12 +25,9 @@ end
 
 case node['platform_family']
 when 'debian'
-  apt_repository 'nginx' do
-    uri 'https://nginx.org/packages/debian/'
-    components ['nginx']
-    key 'https://nginx.org/keys/nginx_signing.key'
-    action :add
-    only_if { node['nginx']['install_method'] == 'package' }
+  # Use OS-provided nginx packages (available on all modern Debian/Ubuntu)
+  apt_update 'nginx' do
+    action :update
   end
 
 when 'rhel', 'amazon'
