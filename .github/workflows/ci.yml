@@ -52,7 +52,7 @@ jobs:
           path: coverage/
 
   integration:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, chef]
     timeout-minutes: 60
     needs: lint
     strategy:
