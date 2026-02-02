@@ -22,8 +22,8 @@ describe 'nginx::install' do
       expect(chef_run).to install_package('nginx')
     end
 
-    it 'creates the nginx apt repository' do
-      expect(chef_run).to add_apt_repository('nginx')
+    it 'updates apt cache' do
+      expect(chef_run).to update_apt_update('nginx')
     end
   end
 
