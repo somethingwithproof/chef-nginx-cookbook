@@ -63,7 +63,16 @@ end
 
 # Install nginx package based on platform
 case node['platform_family']
-when 'debian', 'rhel', 'amazon', 'suse'
+when 'debian'
+  # Use execute to handle nginx virtual package on Debian/Ubuntu
+  execute 'install-nginx' do
+    command "DEBIAN_FRONTEND=noninteractive apt-get install -y #{node['nginx']['package_name']}"
+    not_if 'dpkg -l nginx-core 2>/dev/null | grep -q ^ii || dpkg -l nginx-light 2>/dev/null | grep -q ^ii'
+    notifies :reload, 'service[nginx]', :delayed
+    only_if { node['nginx']['install_method'] == 'package' }
+  end
+
+when 'rhel', 'amazon', 'suse'
   package node['nginx']['package_name'] do
     action :install
     version node['nginx']['version'] if node['nginx']['version']

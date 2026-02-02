@@ -6,6 +6,10 @@ describe 'nginx::default' do
   context 'with modules enabled on Ubuntu 22.04' do
     platform 'ubuntu', '22.04'
 
+    before do
+      stub_command('dpkg -l nginx-core 2>/dev/null | grep -q ^ii || dpkg -l nginx-light 2>/dev/null | grep -q ^ii').and_return(false)
+    end
+
     let(:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '22.04') do |node|
         node.normal['nginx']['modules'] = %w(http_ssl http_v2 http_geoip http_stub_status)
@@ -17,12 +21,16 @@ describe 'nginx::default' do
     end
 
     it 'installs nginx package' do
-      expect(chef_run).to install_package('nginx-core')
+      expect(chef_run).to run_execute('install-nginx')
     end
   end
 
   context 'with brotli module on Ubuntu 22.04' do
     platform 'ubuntu', '22.04'
+
+    before do
+      stub_command('dpkg -l nginx-core 2>/dev/null | grep -q ^ii || dpkg -l nginx-light 2>/dev/null | grep -q ^ii').and_return(false)
+    end
 
     let(:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '22.04') do |node|

@@ -10,16 +10,20 @@ describe 'nginx::install' do
       stub_command('test -f /etc/apt/sources.list.d/nginx.list').and_return(false)
     end
 
+    before do
+      stub_command('dpkg -l nginx-core 2>/dev/null | grep -q ^ii || dpkg -l nginx-light 2>/dev/null | grep -q ^ii').and_return(false)
+    end
+
     let(:chef_run) do
       runner = ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '22.04') do |node|
         node.normal['nginx']['install_method'] = 'package'
-        node.normal['nginx']['package_name'] = 'nginx-core'
+        node.normal['nginx']['package_name'] = 'nginx'
       end
       runner.converge(described_recipe)
     end
 
     it 'installs nginx package' do
-      expect(chef_run).to install_package('nginx-core')
+      expect(chef_run).to run_execute('install-nginx')
     end
 
     it 'updates apt cache' do

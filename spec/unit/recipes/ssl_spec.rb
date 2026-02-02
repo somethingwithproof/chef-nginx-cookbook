@@ -6,6 +6,10 @@ describe 'nginx::default' do
   context 'with SSL enabled on Ubuntu 22.04' do
     platform 'ubuntu', '22.04'
 
+    before do
+      stub_command('dpkg -l nginx-core 2>/dev/null | grep -q ^ii || dpkg -l nginx-light 2>/dev/null | grep -q ^ii').and_return(false)
+    end
+
     let(:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '22.04') do |node|
         node.normal['nginx']['ssl']['enabled'] = true
@@ -19,7 +23,7 @@ describe 'nginx::default' do
     end
 
     it 'installs nginx package' do
-      expect(chef_run).to install_package('nginx-core')
+      expect(chef_run).to run_execute('install-nginx')
     end
 
     it 'enables nginx service' do
@@ -29,6 +33,10 @@ describe 'nginx::default' do
 
   context 'with HTTP/2 and TLS 1.3 on Ubuntu 24.04' do
     platform 'ubuntu', '24.04'
+
+    before do
+      stub_command('dpkg -l nginx-core 2>/dev/null | grep -q ^ii || dpkg -l nginx-light 2>/dev/null | grep -q ^ii').and_return(false)
+    end
 
     let(:chef_run) do
       ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '24.04') do |node|
