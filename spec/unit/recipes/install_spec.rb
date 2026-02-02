@@ -13,7 +13,7 @@ describe 'nginx::install' do
     let(:chef_run) do
       runner = ChefSpec::SoloRunner.new(platform: 'ubuntu', version: '22.04') do |node|
         node.normal['nginx']['install_method'] = 'package'
-        node.normal['nginx']['package_name'] = 'nginx'
+        node.normal['nginx']['package_name'] = 'nginx-core'
       end
       runner.converge(described_recipe)
     end
