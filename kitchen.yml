@@ -3,14 +3,7 @@ driver:
   name: dokken
   privileged: true
   chef_version: "18"
-  memory: 2048
-  cpu: 2
-  volumes:
-    - /sys/fs/cgroup:/sys/fs/cgroup:rw
-  tmpfs:
-    - /tmp
-    - /run
-    - /run/lock
+  chef_license: accept-no-persist
 
 transport:
   name: dokken
