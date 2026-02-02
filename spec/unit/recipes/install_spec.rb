@@ -19,7 +19,7 @@ describe 'nginx::install' do
     end
 
     it 'installs nginx package' do
-      expect(chef_run).to install_package('nginx')
+      expect(chef_run).to install_package('nginx-core')
     end
 
     it 'updates apt cache' do
