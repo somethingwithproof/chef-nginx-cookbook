@@ -6,12 +6,16 @@ describe 'nginx::default' do
   context 'on Ubuntu 22.04' do
     platform 'ubuntu', '22.04'
 
+    before do
+      stub_command('dpkg -l nginx-core 2>/dev/null | grep -q ^ii || dpkg -l nginx-light 2>/dev/null | grep -q ^ii').and_return(false)
+    end
+
     it 'converges successfully' do
       expect { chef_run }.to_not raise_error
     end
 
     it 'installs nginx package' do
-      expect(chef_run).to install_package('nginx-core')
+      expect(chef_run).to run_execute('install-nginx')
     end
 
     it 'enables nginx service' do
