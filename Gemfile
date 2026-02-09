@@ -15,8 +15,9 @@ group :development do
 end
 
 group :test do
+  gem 'inspec-core', '~> 6.0'
   gem 'kitchen-dokken', '~> 2.20'
-  gem 'kitchen-inspec', '~> 3.0'
+  gem 'kitchen-inspec', '~> 3.1'
   gem 'test-kitchen', '>= 3.0'
   gem 'simplecov', '~> 0.22'
   gem 'rspec_junit_formatter'
