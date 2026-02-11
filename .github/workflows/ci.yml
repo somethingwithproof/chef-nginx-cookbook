@@ -28,7 +28,7 @@ jobs:
       - name: Install system dependencies for ruby-shadow
         run: |
           apt-get update || sudo apt-get update
-          apt-get install -y libpam0g-dev || sudo apt-get install -y libpam0g-dev
+          apt-get install -y libpam0g-dev libyaml-dev || sudo apt-get install -y libpam0g-dev libyaml-dev
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -79,7 +79,7 @@ jobs:
       - name: Install system dependencies for ruby-shadow
         run: |
           apt-get update || sudo apt-get update
-          apt-get install -y libpam0g-dev || sudo apt-get install -y libpam0g-dev
+          apt-get install -y libpam0g-dev libyaml-dev || sudo apt-get install -y libpam0g-dev libyaml-dev
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -111,6 +111,8 @@ jobs:
     needs: lint
     steps:
       - uses: actions/checkout@v6
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libyaml-dev
       - name: Run security scan
         uses: ruby/setup-ruby@v1
         with:
