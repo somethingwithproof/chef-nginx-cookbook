@@ -24,7 +24,7 @@ jobs:
     runs-on: [self-hosted, chef]
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Install system dependencies for ruby-shadow
         run: |
           apt-get update || sudo apt-get update
@@ -42,13 +42,13 @@ jobs:
         run: bundle exec rspec --format documentation --format RspecJunitFormatter --out rspec.xml
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: rspec-results
           path: rspec.xml
       - name: Upload coverage results
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: coverage-results
           path: coverage/
@@ -75,7 +75,7 @@ jobs:
       DOCKER_MEMORY: "2048m"
       DOCKER_CPUS: "2"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Install system dependencies for ruby-shadow
         run: |
           apt-get update || sudo apt-get update
@@ -86,7 +86,7 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349
       - name: Free disk space
         run: |
           sudo apt-get clean
@@ -100,7 +100,7 @@ jobs:
           KITCHEN_YAML: kitchen.yml
       - name: Upload kitchen logs on failure
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: kitchen-logs-${{ matrix.suite }}-${{ matrix.os }}
           path: .kitchen/logs/
@@ -110,7 +110,7 @@ jobs:
     timeout-minutes: 15
     needs: lint
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Run security scan
         uses: ruby/setup-ruby@v1
         with:
