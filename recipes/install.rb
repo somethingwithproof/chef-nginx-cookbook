@@ -95,6 +95,9 @@ when 'mac_os_x'
 end
 
 if node['nginx']['install_method'] == 'source'
+  # Validate checksum is provided for source installations
+  raise 'node["nginx"]["source"]["checksum"] must be set when installing from source for security verification' if node['nginx']['source']['checksum'].nil?
+
   # Install build dependencies
   build_essential 'install_build_tools' do
     action :install
@@ -109,7 +112,7 @@ if node['nginx']['install_method'] == 'source'
   # Download nginx source
   remote_file "#{Chef::Config['file_cache_path']}/nginx-#{node['nginx']['version']}.tar.gz" do
     source node['nginx']['source']['url']
-    checksum node['nginx']['source']['checksum'] if node['nginx']['source']['checksum']
+    checksum node['nginx']['source']['checksum']
     action :create
   end
 
