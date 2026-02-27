@@ -359,13 +359,29 @@ See the [attributes file](attributes/default.rb) for default values.
 
 ## Recipes
 
-- `default.rb` - Calls other recipes
-- `install.rb` - Installs Nginx
-- `configure.rb` - Basic configuration
-- `service.rb` - Sets up service
-- `sites.rb` - Configures sites from attributes
-- `security.rb` - Applies security hardening
-- `telemetry.rb` - Configures Prometheus and Grafana integration
+### default
+Main recipe that orchestrates NGINX installation. Includes installation, configuration, and service management.
+
+### install
+Installs NGINX from OS packages or source with support for mainline and stable branches.
+
+### configure
+Configures NGINX settings including nginx.conf, security headers, worker processes, and performance tuning.
+
+### service
+Manages the NGINX service including start, stop, restart, reload, and graceful reload operations.
+
+### sites
+Configures NGINX virtual hosts from node attributes for serving multiple websites.
+
+### letsencrypt
+Integrates Let's Encrypt for automatic SSL certificate provisioning and renewal.
+
+### stream
+Configures NGINX stream module for TCP/UDP load balancing and proxying.
+
+### telemetry
+Configures Prometheus metrics exporter and Grafana dashboard integration for monitoring.
 
 ## Usage
 
@@ -440,7 +456,48 @@ chef exec rspec
 
 # Run integration tests
 kitchen test
+
+# Run linting
+cookstyle
 ```
+
+## Development
+
+This cookbook uses a comprehensive testing and linting workflow:
+
+```bash
+# Install dependencies
+bundle install
+
+# Run unit tests (ChefSpec)
+chef exec rspec
+
+# Run integration tests (Test Kitchen)
+kitchen test
+
+# Run style checks (cookstyle)
+cookstyle
+
+# Run all tests
+delivery local all
+```
+
+## Contributing
+
+1. Fork the repository on GitHub
+2. Create a feature branch (`git checkout -b feature/my-new-feature`)
+3. Write tests for your changes
+4. Make your changes
+5. Run the test suite to ensure all tests pass
+6. Commit your changes (`git commit -am 'Add new feature'`)
+7. Push to the branch (`git push origin feature/my-new-feature`)
+8. Create a Pull Request
+
+Please ensure:
+- All tests pass before submitting PR
+- Code follows Cookstyle guidelines
+- New features include appropriate tests
+- Documentation is updated for any new attributes or recipes
 
 ## License
 

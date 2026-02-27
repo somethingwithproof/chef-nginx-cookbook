@@ -10,7 +10,8 @@ transport:
 
 provisioner:
   name: dokken
-  chef_license: accept
+  product_name: cinc
+  chef_license: accept-no-persist
   enforce_idempotency: true
   multiple_converge: 2
   deprecations_as_errors: true
@@ -22,6 +23,9 @@ provisioner:
 
 verifier:
   name: inspec
+  chef_license: accept-no-persist
+  env_vars:
+    CHEF_LICENSE: accept-no-persist
   sudo: true
   reporter:
     - cli
