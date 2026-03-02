@@ -432,7 +432,8 @@ GEM
       method_source (~> 1.0)
       reline (>= 0.6.0)
     pstore (0.1.4)
-    psych (4.0.6)
+    psych (5.3.1)
+      date
       stringio
     public_suffix (7.0.2)
     racc (1.8.1)
@@ -648,7 +649,7 @@ DEPENDENCIES
   inspec-core (~> 6.0)
   kitchen-dokken (~> 2.20)
   kitchen-inspec (~> 3.1)
-  psych (< 5)
+  psych (< 6)
   rake (~> 13.0)
   rspec_junit_formatter
   simplecov (~> 0.22)
