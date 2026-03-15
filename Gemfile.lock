@@ -552,7 +552,7 @@ GEM
     time (0.4.2)
       date
     timeliness (0.3.10)
-    timeout (0.6.0)
+    timeout (0.6.1)
     tomlrb (1.3.0)
     trailblazer-option (0.1.2)
     train (3.16.1)
